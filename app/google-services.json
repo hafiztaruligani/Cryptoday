@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "298138330732",
+    "project_id": "cryptoday-b7775",
+    "storage_bucket": "cryptoday-b7775.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:298138330732:android:fba4353359673d4d5b1a49",
+        "android_client_info": {
+          "package_name": "com.hafiztaruligani.cryptoday"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "298138330732-tdmant8b3ed9dc1v3ihm8depgbvq3sh5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5kwaKutlX7CT0WD3i_3D19mYFFXieVOE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "298138330732-tdmant8b3ed9dc1v3ihm8depgbvq3sh5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

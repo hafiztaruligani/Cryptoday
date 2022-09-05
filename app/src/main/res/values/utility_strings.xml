@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="all_favourite">all_favourite</string>
+    <string name="coin_logo">coin_logo</string>
+    <string name="text_view">text_view</string>
+</resources>

@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Cryptoday</string>
+    <string name="currencies">Currencies</string>
+    <string name="convert">Convert</string>
+    <string name="info">Info</string>
+    <string name="list_setting">list setting</string>
+    <string name="search">Search…</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="current_price">Current Price</string>
+    <string name="low">Low</string>
+    <string name="high">High</string>
+    <string name="market_cap">Market Cap</string>
+    <string name="volume_24h">Volume (24h)</string>
+    <string name="circulating_supply">Circulating Supply</string>
+    <string name="maximum_supply">Maximum Supply</string>
+    <string name="genesis_date">Genesis Date</string>
+    <string name="link">Link</string>
+    <string name="slide">slider</string>
+    <string name="space">"             "</string>
+    <string name="google_account_not_found">Google Account Not Found</string>
+    <string name="coma">,</string>
+    <string name="retry">retry?</string>
+    <string name="wait_server_limited">Server call limited, wait</string>
+    <string name="network_unavailable">Somethings wrong, couldn\'t reach server</string>
+</resources>

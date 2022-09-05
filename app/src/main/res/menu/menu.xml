@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/currencies_fragment"
+        android:title="@string/currencies"
+        />
+    <item
+        android:id="@+id/convert_fragment"
+        android:title="@string/convert"/>
+    <item
+        android:id="@+id/info_fragment"
+        android:title="@string/info"/>
+</menu>

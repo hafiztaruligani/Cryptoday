@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/currencies_fragment">
+
+
+
+    <fragment
+        android:id="@+id/detail_fragment"
+        android:name="com.hafiztaruligani.cryptoday.presentation.detail.DetailFragment"
+        android:label="fragment_detail"
+        tools:layout="@layout/fragment_detail" >
+        <argument
+            android:name="coin"
+            app:argType="com.hafiztaruligani.cryptoday.domain.model.Coin" />
+    </fragment>
+    <fragment
+        android:id="@+id/currencies_fragment"
+        android:name="com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesFragment"
+        android:label="fragment_currencies"
+        tools:layout="@layout/fragment_currencies" >
+        <action
+            android:id="@+id/action_currenciesFragment_to_convertFragment"
+            app:destination="@id/convert_fragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_currencies_fragment_to_detail_fragment"
+            app:destination="@id/detail_fragment"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/convert_fragment"
+        android:name="com.hafiztaruligani.cryptoday.presentation.convert.ConvertFragment"
+        android:label="fragment_convert"
+        tools:layout="@layout/fragment_convert" >
+        <action
+            android:id="@+id/action_convertFragment_to_infoFragment"
+            app:destination="@id/info_fragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/info_fragment"
+        android:name="com.hafiztaruligani.cryptoday.presentation.info.InfoFragment"
+        android:label="fragment_info"
+        tools:layout="@layout/fragment_info" >
+        <action
+            android:id="@+id/action_info_fragment_to_detail_fragment"
+            app:destination="@id/detail_fragment" />
+        <action
+            android:id="@+id/action_info_fragment_to_login"
+            app:destination="@id/login" />
+    </fragment>
+    <fragment
+        android:id="@+id/login"
+        android:name="com.hafiztaruligani.cryptoday.presentation.login.Login"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" />
+</navigation>
