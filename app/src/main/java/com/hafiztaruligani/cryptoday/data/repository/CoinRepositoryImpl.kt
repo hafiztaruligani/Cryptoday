@@ -45,7 +45,8 @@ class CoinRepositoryImpl (
             vsCurrency = "USD",
             order = "market_cap_desc",
             page = page,
-            pageSize = pageSize
+            pageSize = pageSize,
+            ids =""
         )
     }
 

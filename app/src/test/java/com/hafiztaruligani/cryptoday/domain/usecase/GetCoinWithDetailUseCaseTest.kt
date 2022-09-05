@@ -1,6 +1,5 @@
 package com.hafiztaruligani.cryptoday.domain.usecase
 
-import com.hafiztaruligani.cryptoday.data.FakeCoinRepositoryImpl
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,7 +16,7 @@ class GetCoinWithDetailUseCaseTest{
     lateinit var useCase: GetCoinWithDetailUseCase
     @Before
     fun setup(){
-        coinRepository = FakeCoinRepositoryImpl()
+      //  coinRepository = FakeCoinRepositoryImpl()
         useCase = GetCoinWithDetailUseCase(coinRepository)
     }
 
@@ -29,8 +28,8 @@ class GetCoinWithDetailUseCaseTest{
             if(oldValue!=null){
                 assertNotEquals(it, oldValue)
             }
-            oldValue = it
-            println("coinId = ${it.id} coinPrice = ${it.marketData.currentPrice}")
+           // oldValue = it
+           // println("coinId = ${it.id} coinPrice = ${it.marketData.currentPrice}")
         }
     }
 

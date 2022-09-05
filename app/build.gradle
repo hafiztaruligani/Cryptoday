@@ -117,4 +117,7 @@ dependencies {
     testImplementation("androidx.paging:paging-common:$paging_version")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    testImplementation("com.google.truth:truth:1.1.3")
+
 }

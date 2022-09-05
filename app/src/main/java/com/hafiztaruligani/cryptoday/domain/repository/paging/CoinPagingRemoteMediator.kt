@@ -23,8 +23,9 @@ class CoinPagingRemoteMediator @Inject constructor(
     private val coinRepository: CoinRepository,
     private val appDatabase: AppDatabase
 ): RemoteMediator<Int, CoinEntity>() {
-
-    lateinit var updateJob: Job
+    override suspend fun initialize(): InitializeAction {
+        return super.initialize()
+    }
 
     override suspend fun load(
         loadType: LoadType,
@@ -45,7 +46,6 @@ class CoinPagingRemoteMediator @Inject constructor(
                 }
             }
 
-
             val data: List<CoinResponse> = coinRepository.getCoinsFromNetwork(
                 page = loadKey,
                 pageSize = when (loadType) {
@@ -57,7 +57,7 @@ class CoinPagingRemoteMediator @Inject constructor(
             appDatabase.withTransaction {
                 Log.d(TAG, "load : loadType: $loadType || loadKey: $loadKey")
                 if (loadType == REFRESH) {
-                    coinRepository.deleteCoins()
+                   // coinRepository.deleteCoins()
                     coinRepository.deleteCoinRemoteKey()
                 }
 
@@ -72,7 +72,9 @@ class CoinPagingRemoteMediator @Inject constructor(
         }catch (e: IOException){
             Log.e(TAG, "load error IO: $e")
             return MediatorResult.Error(e)
+        }catch (e:Exception){
+            Log.e(TAG, "load error E: $e")
+            return MediatorResult.Error(e)
         }
-
     }
 }

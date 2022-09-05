@@ -40,10 +40,8 @@ class DetailFragment() : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         binding = FragmentDetailBinding.inflate(layoutInflater)
         animate()
-
 
         viewModel.initData(args.coin.id)
         loading = LoadingBar(binding.root.context)

@@ -23,6 +23,10 @@ fun TextView.removeLinksUnderline(context: Context) {
     text = spannable
 }
 
+fun List<Any>.removeBracket(): String{
+    return toString().drop(1).dropLast(1)
+}
+
 
 //fun Any?.toInt(): Int = this.toString().toInt()
 //fun Any?.toDouble(): Double = this.toString().toDouble()

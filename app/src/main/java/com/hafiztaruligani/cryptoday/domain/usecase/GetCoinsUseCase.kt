@@ -2,6 +2,7 @@ package com.hafiztaruligani.cryptoday.domain.usecase
 
 import android.util.Log
 import androidx.paging.*
+import com.hafiztaruligani.cryptoday.data.local.entity.CoinRemoteKey
 import com.hafiztaruligani.cryptoday.data.remote.dto.CoinResponse
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.repository.paging.CoinPagingRemoteMediator
@@ -30,16 +31,14 @@ class GetCoinsUseCase @Inject constructor(
 
     private var updateJob : Job? = null
 
-    operator fun invoke(): Flow<Resource<PagingData<Coin>>> {
-        val scope2 = CoroutineScope(Dispatchers.IO)
-        update(scope2)
+    operator fun invoke(): Flow<PagingData<Coin>> {
+        update()
         return flow {
-            emit(Loading())
-            try {
                 Pager(
                     config = PagingConfig(
                         initialLoadSize = Cons.PER_PAGE,
-                        pageSize = Cons.PER_PAGE
+                        pageSize = Cons.PER_PAGE,
+                        prefetchDistance = Cons.PRE_FETCH_DISTANCE
                     ),
                     remoteMediator = coinPagingRemoteMediator
                 ){
@@ -49,32 +48,22 @@ class GetCoinsUseCase @Inject constructor(
                     updateJob?.cancel().also { Log.d(TAG, "update: canceling ") }
 
                     val data: PagingData<Coin> = it.map { coinEntity -> coinEntity.toCoin()}
-                    emit(Success(data))
+                    emit(data)
 
                     if (updateJob?.isActive == false || updateJob == null)
-                        update(scope2)
+                        update()
                 }
 
-            }catch (e: HttpException){
-                if(e.code()==429) emit(Error(NETWORK_RESTRICTED))
-                else emit(Error())
-                Log.e(TAG, "load error invoke http: ${e.code()} || ${e.localizedMessage}")
-            }catch (e: IOException){
-                emit(Error(NETWORK_UNAVAILABLE))
-                Log.e(TAG, "load error invoke exception: ${e.message}")
-            }catch (e: Exception){
-                emit(Error(NETWORK_UNAVAILABLE))
-            }
         }
     }
 
-    private fun update(scope: CoroutineScope) {
+    private fun update() {
         updateJob = CoroutineScope(Dispatchers.IO).launch {
             try {
                 delay(UPDATE_DELAY_TIME)
 
                 yield()
-                val nextPage = coinRepository.getCoinRemoteKey()
+                val nextPage: CoinRemoteKey? = coinRepository.getCoinRemoteKey()
 
                 var pageSize = Cons.PER_PAGE
                 val maxPageSize = 250 //valid pageSize range -> 1..250
@@ -99,7 +88,7 @@ class GetCoinsUseCase @Inject constructor(
                     page++
                     count-=maxPageSize
 
-                    if(pageSize>2000){
+                    if(pageSize>250){
                         delay(2000)
                     }
                 }
@@ -109,7 +98,7 @@ class GetCoinsUseCase @Inject constructor(
                     coinResponse.map { it.toCoinEntity() }
                 )
 
-                update(scope)
+                update()
             }catch (e: HttpException){
                 Log.e(TAG, "load : update: $e")
             }catch (e: IOException){

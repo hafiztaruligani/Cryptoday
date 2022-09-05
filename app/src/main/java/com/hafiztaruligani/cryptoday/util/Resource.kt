@@ -3,7 +3,7 @@ package com.hafiztaruligani.cryptoday.util
 
 sealed class Resource <T> (){
     companion object{
-        const val NETWORK_RESTRICTED = "Server calls have been restricted, wait 1 minute"
+        const val NETWORK_RESTRICTED = "server calls have been restricted, wait 1 minute"
         const val NETWORK_UNAVAILABLE = "Somethings wrong, couldn't reach server"
     }
 

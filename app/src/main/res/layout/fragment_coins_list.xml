@@ -6,6 +6,51 @@
     android:layout_height="match_parent"
     tools:context=".presentation.currencies.coinslist.CoinsListFragment">
 
+    <View
+        android:visibility="gone"
+        android:id="@+id/message_background"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/line_color"
+        app:layout_constraintBottom_toBottomOf="@+id/message"
+        app:layout_constraintTop_toTopOf="@+id/message" />
+
+
+    <TextView
+        android:visibility="gone"
+        android:paddingVertical="2dp"
+        android:id="@+id/message"
+        style="@style/font_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toStartOf="@+id/btn_retry"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:visibility="gone"
+        android:layout_marginStart="4dp"
+        android:paddingVertical="2dp"
+        android:id="@+id/btn_retry"
+        style="@style/font_small"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="@string/retry"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/message"
+        app:layout_constraintTop_toTopOf="@+id/message" />
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/coins_rc"
         android:layout_width="match_parent"

@@ -7,18 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.hafiztaruligani.cryptoday.data.local.AppDatabase
+import com.hafiztaruligani.cryptoday.R
 import com.hafiztaruligani.cryptoday.databinding.FragmentCoinsListBinding
 import com.hafiztaruligani.cryptoday.presentation.LoadingBar
 import com.hafiztaruligani.cryptoday.presentation.adapters.CoinsAdapter
@@ -27,10 +25,9 @@ import com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesFragmentD
 import com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesViewModel
 import com.hafiztaruligani.cryptoday.util.CoinDiffUtil
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
-import com.hafiztaruligani.cryptoday.util.Cons.UPDATE_DELAY_TIME
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import retrofit2.HttpException
 
 
 class CoinsListFragment : Fragment() {
@@ -82,57 +79,61 @@ class CoinsListFragment : Fragment() {
 
 
     private fun setupRc() {
-        layoutManager = LinearLayoutManager(context)
-        adapter = CoinsAdapter(coinDiffUtil)
         coinsRc = binding.coinsRc
-        coinsRc.adapter = adapter
+        layoutManager = LinearLayoutManager(context)
         coinsRc.layoutManager = layoutManager
+        adapter = CoinsAdapter(coinDiffUtil)
+        val pagingLoadStateAdapter= PagingLoadStateAdapter(lifecycleScope){ adapter.retry() }
+        coinsRc.adapter = adapter.withLoadStateFooter(pagingLoadStateAdapter)
+        binding.btnRetry.setOnClickListener { adapter.retry() }
 
-        adapter.withLoadStateFooter(PagingLoadStateAdapter(adapter::retry))
-       /* lifecycleScope.launchWhenResumed {
-            adapter.loadStateFlow.collectLatest{
-                when (val refresh = it.mediator?.refresh){
-                    is LoadState.Loading ->  Log.d(TAG, "setupRc refresh: loading")
+        lifecycleScope.launch {
+            adapter.loadStateFlow.collect(){
+                pagingLoadStateAdapter.loadState = it.mediator?.refresh ?:it.append
+
+                val isError = it.mediator?.refresh is LoadState.Error
+
+                binding.apply {
+                    messageBackground.bringToFront()
+                    message.bringToFront()
+                    btnRetry.bringToFront()
+                    message.isVisible = isError
+                    btnRetry.isVisible = isError
+                    messageBackground.isVisible = isError
+
+                    if(adapter.itemCount==0) message.text = context?.getString(R.string.network_unavailable)
+                    else message.text = context?.getString(R.string.this_data_is_not_up_to_date)
+                }
+
+                when (val refresh = it.mediator?.refresh) {
+                    is LoadState.Loading -> Log.d(TAG, "setupRc refresh: loading")
                     is LoadState.NotLoading -> Log.d(TAG, "setupRc refresh: not loading")
-                    is LoadState.Error -> Log.d(TAG, "setupRc refresh: error : ${refresh.error}").also {
-                        if(refresh.error is  HttpException){
-                            Log.d(TAG, "setupRc: error code ${(refresh.error as HttpException).code()}")
-                        }
+                    is LoadState.Error -> {
+                        Log.d(TAG, "setupRc refresh: error : ${refresh.error}")
+                        //  pagingLoadStateAdapter.loadState = loadStates.refresh
                     }
                     else -> {}
                 }
 
-                when (val append = it.mediator?.append){
-                    is LoadState.Loading ->  Log.d(TAG, "setupRc append: loading")
+                when (val append = it.mediator?.append) {
+                    is LoadState.Loading -> Log.d(TAG, "setupRc append: loading")
                     is LoadState.NotLoading -> Log.d(TAG, "setupRc append: not loading")
-                    is LoadState.Error -> Log.d(TAG, "setupRc append: error : ${append.error}")
+                    is LoadState.Error -> {
+                        Log.d(TAG, "setupRc append: error : ${append.error}")
+                        //pagingLoadStateAdapter.loadState = append
+                    }
                     else -> {}
                 }
-
             }
-        }*/
+
+        }
     }
 
     private fun observeData() {
-        viewModel.initData()
-
-        viewModel.state.observe(viewLifecycleOwner){state->
-            Log.e(TAG, "error log view state: a ${
-                if(state.data!=null) "success"
-                else if (state.error.isNotBlank()) "error ${state.error} ${state.loading}"
-                else "loading :${state.loading}"
-            }")
-
-            state.data?.let {
-                lifecycleScope.launchWhenResumed {
-                    adapter.submitData(it)
-                }
+        lifecycleScope.launchWhenResumed{
+            viewModel.coins.collect() { data ->
+                adapter.submitData(data)
             }
-
-            if(state.error.isNotBlank()) {
-                Toast.makeText(context, state.error, Toast.LENGTH_LONG).show()
-            }
-            loading.state(state.loading)
         }
     }
 }

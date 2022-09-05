@@ -32,11 +32,8 @@ class CoinsAdapter (coinDiffUtil: CoinDiffUtil)
     }
 
     override fun onBindViewHolder(holder: CoinViewHolder, position: Int) {
-        Log.d(TAG, "onBindViewHolder: $position")
-
         val coinData = getItem(position)
         val marketData = coinData?.marketData
-        Log.d(TAG, "onBindViewHolder: $coinData")
         holder.binding.apply {
 
             ViewCompat.setTransitionName(coinItem, "${position}_${coinData?.id}")
