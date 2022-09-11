@@ -3,12 +3,15 @@ package com.hafiztaruligani.cryptoday.domain.model
 import android.os.Parcelable
 import android.util.Log
 import kotlinx.parcelize.Parcelize
+import okhttp3.internal.format
 import java.text.DecimalFormat
+import java.text.NumberFormat
+import java.util.*
 
 @Parcelize
 data class MarketData(
     val timeUnit: String,
-    val marketCapRank: Int,
+    val marketCapRank: Int?,
     val currentPrice: Double,
     val priceChangePercentage: Double,
     val low: Double,
@@ -16,20 +19,26 @@ data class MarketData(
     val marketCap: Double,
     val circulatingSupply: Double,
     val maxSupply: Double,
-    val pair: String,
     val volume: Double,
+    val currencyPair: String,
     var lastUpdate: String
 ) : Parcelable {
+
+    companion object{
+        private val formatter = NumberFormat.getCurrencyInstance()
+    }
+
     fun fiatFormat(value: Any): String{
-        return try {
+        try {
             if(value.toString().toDouble()==0.0) return "-"
-
-            val formatter = DecimalFormat("###,##0.000")
-            val result = "$ ${formatter.format(value)}" // TODO: currencies
-
+            val currencyFormat = Currency.getInstance(currencyPair.uppercase())
+            formatter.currency = currencyFormat
+            formatter.maximumFractionDigits = 3
+            formatter.isParseIntegerOnly = true
+            val result = formatter.format(value)
             return dropZero(result)
         }catch (e: Exception){
-            "-"
+            return cryptoFormat(value, currencyPair)
         }
     }
 

@@ -33,4 +33,7 @@ interface ApiService {
     suspend fun search(
         @Query("query") params: String
     ):SearchResponse
+
+    @GET("simple/supported_vs_currencies")
+    suspend fun getSupportedPair(): List<String>
 }

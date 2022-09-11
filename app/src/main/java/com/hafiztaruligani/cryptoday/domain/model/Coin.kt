@@ -12,7 +12,9 @@ data class Coin(
     val name: String,
     val image: String,
     val marketData: MarketData
-    ) : Parcelable {
+) : Parcelable {
 
-    fun getTitle() = "#${marketData.marketCapRank} $name (${symbol.uppercase()})"
+    fun getTitle() =
+        if (marketData.marketCapRank==null) "$name (${symbol.uppercase()})"
+        else "#${marketData.marketCapRank} $name (${symbol.uppercase()})"
 }

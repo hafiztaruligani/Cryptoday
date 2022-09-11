@@ -1,11 +1,10 @@
-package com.hafiztaruligani.cryptoday.data.local
+package com.hafiztaruligani.cryptoday.data.local.room
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinRemoteKey
-import java.nio.channels.SelectionKey
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinRemoteKey
 
 @Dao
 interface CoinRemoteKeyDao {

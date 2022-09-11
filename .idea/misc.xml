@@ -15,15 +15,17 @@
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_coins_list.xml" value="0.33" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_conver.xml" value="0.2557291666666667" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_convert.xml" value="0.18802083333333333" />
-        <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_currencies.xml" value="0.33" />
+        <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_currencies.xml" value="0.36770833333333336" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_detail.xml" value="0.33" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_favourite_list.xml" value="0.33" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_info.xml" value="0.2" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_login.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_settings.xml" value="0.5" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/frame_container.xml" value="0.2171875" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/item.xml" value="0.36666666666666664" />
-        <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/item_coin.xml" value="0.5" />
+        <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/item_coin.xml" value="0.33" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/item_load_state.xml" value="0.5" />
+        <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/item_pair.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/loading_bar.xml" value="0.11574074074074074" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/menu/menu.xml" value="0.2557291666666667" />
       </map>

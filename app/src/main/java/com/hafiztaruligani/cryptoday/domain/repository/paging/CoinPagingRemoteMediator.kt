@@ -4,15 +4,13 @@ import android.util.Log
 import androidx.paging.*
 import androidx.paging.LoadType.*
 import androidx.room.withTransaction
-import com.hafiztaruligani.cryptoday.data.local.AppDatabase
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinEntity
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinRemoteKey
+import com.hafiztaruligani.cryptoday.data.local.room.AppDatabase
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinRemoteKey
 import com.hafiztaruligani.cryptoday.data.remote.dto.CoinResponse
 import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
+import com.hafiztaruligani.cryptoday.domain.usecase.CoinsOrder
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -21,8 +19,10 @@ import javax.inject.Inject
 @OptIn(ExperimentalPagingApi::class)
 class CoinPagingRemoteMediator @Inject constructor(
     private val coinRepository: CoinRepository,
-    private val appDatabase: AppDatabase
+    private val appDatabase: AppDatabase,
+    private val coinsOrder: CoinsOrder
 ): RemoteMediator<Int, CoinEntity>() {
+
     override suspend fun initialize(): InitializeAction {
         return super.initialize()
     }
@@ -45,27 +45,30 @@ class CoinPagingRemoteMediator @Inject constructor(
                     remoteKey.nextPage
                 }
             }
-
+            Log.d(TAG, "load: called $loadType $loadKey")
             val data: List<CoinResponse> = coinRepository.getCoinsFromNetwork(
                 page = loadKey,
                 pageSize = when (loadType) {
                     REFRESH -> state.config.initialLoadSize
                     else -> state.config.pageSize
-                }
+                },
+                vsCurrencies = coinsOrder.currencyPair,
+                sortBy = coinsOrder.sortBy.apiString,
+                ids = coinsOrder.ids
             )
-
             appDatabase.withTransaction {
                 Log.d(TAG, "load : loadType: $loadType || loadKey: $loadKey")
                 if (loadType == REFRESH) {
-                   // coinRepository.deleteCoins()
+                    coinRepository.deleteCoins()
                     coinRepository.deleteCoinRemoteKey()
                 }
 
                 loadKey++
                 coinRepository.insertCoinRemoteKey(CoinRemoteKey("", loadKey))
-                coinRepository.insertCoins(data.map { it.toCoinEntity() })
+                coinRepository.insertCoins(data.map { it.toCoinEntity(currencyPair = coinsOrder.currencyPair) })
             }
             return MediatorResult.Success(endOfPaginationReached = data.isEmpty())
+
         }catch (e: HttpException){
             Log.e(TAG, "load error http: $e")
             return MediatorResult.Error(e)

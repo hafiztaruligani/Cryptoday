@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -24,6 +25,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.hafiztaruligani.cryptoday.databinding.FragmentDetailBinding
 import com.hafiztaruligani.cryptoday.domain.model.MarketData
 import com.hafiztaruligani.cryptoday.presentation.LoadingBar
+import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import com.hafiztaruligani.cryptoday.util.removeLinksUnderline
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -45,7 +47,11 @@ class DetailFragment() : Fragment() {
 
         viewModel.initData(args.coin.id)
         loading = LoadingBar(binding.root.context)
-        bindUI()
+        try {
+            bindUI()
+        }catch (e: Exception){
+            binding.slider.isVisible = false
+        }
         return binding.root
 
     }
@@ -117,10 +123,7 @@ class DetailFragment() : Fragment() {
                     low.text = marketData.fiatFormat(marketData.low)
                     high.text = marketData.fiatFormat(marketData.high)
 
-
-                    slider.valueFrom = marketData.low.toFloat()
-                    slider.valueTo = marketData.high.toFloat()
-                    slider.setValues(getSliderValue(marketData))
+                    getSliderValue(marketData)
 
                     marketCap.text = marketData.fiatFormat(marketData.marketCap)
                     volume.text = marketData.fiatFormat(marketData.volume)
@@ -167,23 +170,27 @@ class DetailFragment() : Fragment() {
             slider.thumbTintList = thumbColor
             low.text = args.coin.marketData.fiatFormat(args.coin.marketData.low)
             high.text = args.coin.marketData.fiatFormat(args.coin.marketData.high)
-            slider.valueFrom = args.coin.marketData.low.toFloat()
-            slider.valueTo = args.coin.marketData.high.toFloat()
-            slider.setValues(getSliderValue(args.coin.marketData))
             slider.isEnabled = false
         }
     }
 
-    private fun getSliderValue(marketData: MarketData): Float {
-        val l = marketData.low.toFloat()
-        val h = marketData.high.toFloat()
-        val c = marketData.currentPrice.toFloat()
-        return when{
-            c<l -> l
-            c>h -> h
-            else -> c
+    private fun getSliderValue(marketData: MarketData)  {
+        var l = marketData.low.toFloat()
+        var h = marketData.high.toFloat()
+        var c = marketData.currentPrice.toFloat()
+        binding.apply {
+
+            if(l>h) l = h.also { h = l }
+            if(l>c) l = c
+            if(c>h) h = c
+
+            slider.valueFrom = l
+            slider.valueTo = h
+            slider.setValues(c)
+
         }
     }
+
 }
 
 

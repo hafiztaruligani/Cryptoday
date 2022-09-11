@@ -16,7 +16,7 @@ class LoadingBar(context: Context) : Dialog(context) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.loading_bar)
         setCancelable(false)
-        this.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
     fun state(value : Boolean){
@@ -24,6 +24,8 @@ class LoadingBar(context: Context) : Dialog(context) {
         if (value) this@LoadingBar.show()
         else this@LoadingBar.dismiss()
     }
+
+
 
     override fun onBackPressed() {
     }

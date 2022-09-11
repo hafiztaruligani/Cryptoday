@@ -2,7 +2,8 @@ package com.hafiztaruligani.cryptoday.domain.usecase
 
 import android.util.Log
 import androidx.paging.*
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinRemoteKey
+import com.hafiztaruligani.cryptoday.data.local.room.AppDatabase
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinRemoteKey
 import com.hafiztaruligani.cryptoday.data.remote.dto.CoinResponse
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.repository.paging.CoinPagingRemoteMediator
@@ -10,54 +11,50 @@ import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
 import com.hafiztaruligani.cryptoday.util.Cons
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import com.hafiztaruligani.cryptoday.util.Cons.UPDATE_DELAY_TIME
-import com.hafiztaruligani.cryptoday.util.Resource
-import com.hafiztaruligani.cryptoday.util.Resource.*
-import com.hafiztaruligani.cryptoday.util.Resource.Companion.NETWORK_RESTRICTED
-import com.hafiztaruligani.cryptoday.util.Resource.Companion.NETWORK_UNAVAILABLE
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
-import java.lang.Exception
 import javax.inject.Inject
 
 
 @OptIn(ExperimentalPagingApi::class)
 class GetCoinsUseCase @Inject constructor(
     private val coinRepository: CoinRepository,
-    private val coinPagingRemoteMediator: CoinPagingRemoteMediator
+    val appDatabase: AppDatabase
 ) {
 
     private var updateJob : Job? = null
 
-    operator fun invoke(): Flow<PagingData<Coin>> {
-        update()
+    operator fun invoke(coinsOrder: CoinsOrder): Flow<PagingData<Coin>> {
+        update(coinsOrder)
+        val coinPagingRemoteMediator= CoinPagingRemoteMediator(coinRepository, appDatabase, coinsOrder)
         return flow {
-                Pager(
-                    config = PagingConfig(
-                        initialLoadSize = Cons.PER_PAGE,
-                        pageSize = Cons.PER_PAGE,
-                        prefetchDistance = Cons.PRE_FETCH_DISTANCE
-                    ),
-                    remoteMediator = coinPagingRemoteMediator
-                ){
-                    coinRepository.getCoinsPaged()
-                }.flow.collect(){
+            Pager(
+                config = PagingConfig(
+                    initialLoadSize = Cons.PER_PAGE,
+                    pageSize = Cons.PER_PAGE,
+                    prefetchDistance = Cons.PRE_FETCH_DISTANCE
+                ),
+                remoteMediator = coinPagingRemoteMediator
+            ){
+                coinRepository.getCoinsPaged(coinsOrder)
+            }.flow.collect(){
 
-                    updateJob?.cancel().also { Log.d(TAG, "update: canceling ") }
+                updateJob?.cancel().also { Log.d(TAG, "update: canceling ") }
 
-                    val data: PagingData<Coin> = it.map { coinEntity -> coinEntity.toCoin()}
-                    emit(data)
+                val data: PagingData<Coin> = it.map { coinEntity -> coinEntity.toCoin()}
+                emit(data)
 
-                    if (updateJob?.isActive == false || updateJob == null)
-                        update()
-                }
+                if (updateJob?.isActive == false || updateJob == null)
+                    update(coinsOrder)
+            }
 
         }
     }
 
-    private fun update() {
+    private fun update(coinsOrder: CoinsOrder) {
         updateJob = CoroutineScope(Dispatchers.IO).launch {
             try {
                 delay(UPDATE_DELAY_TIME)
@@ -74,14 +71,24 @@ class GetCoinsUseCase @Inject constructor(
                 val coinResponse = mutableListOf<CoinResponse>()
                 var page = 1
                 var count = pageSize
-                while(count>0){
+                while (false){//(count>0){
+                    var p1 = 0
+                    var p2= 0
+                    if(count>maxPageSize) {
+                        p1 = page
+                        p2 = maxPageSize
+                    }
+                    else {
+                        p1 = ((pageSize - 1).div(count) + 1)
+                        p2 = count
+                    }
                     coinResponse.plusAssign(
-                        if(count>maxPageSize) coinRepository.getCoinsFromNetwork(
-                            page = page,
-                            pageSize = maxPageSize
-                        ) else coinRepository.getCoinsFromNetwork(
-                            page = ((pageSize-1).div(count)+1),
-                            pageSize = count
+                        coinRepository.getCoinsFromNetwork(
+                            page = p1,
+                            pageSize = p2,
+                            vsCurrencies = coinsOrder.currencyPair,
+                            sortBy = coinsOrder.sortBy.apiString,
+                            ids = coinsOrder.ids
                         )
                     )
 
@@ -95,10 +102,10 @@ class GetCoinsUseCase @Inject constructor(
 
                 yield()
                 coinRepository.insertCoins(
-                    coinResponse.map { it.toCoinEntity() }
+                    coinResponse.map { it.toCoinEntity(currencyPair = coinsOrder.currencyPair) }
                 )
 
-                update()
+                update(coinsOrder)
             }catch (e: HttpException){
                 Log.e(TAG, "load : update: $e")
             }catch (e: IOException){

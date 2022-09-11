@@ -1,7 +1,7 @@
 package com.hafiztaruligani.cryptoday.data.remote.dto.coindetail
 
 import com.google.gson.annotations.SerializedName
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinDetailEntity
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinDetailEntity
 
 data class CoinDetailResponse(
 

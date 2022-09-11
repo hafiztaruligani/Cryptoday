@@ -8,6 +8,7 @@ import android.text.style.URLSpan
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.hafiztaruligani.cryptoday.R
+import java.io.IOException
 
 fun TextView.removeLinksUnderline(context: Context) {
     val spannable = SpannableString(text)
@@ -25,6 +26,11 @@ fun TextView.removeLinksUnderline(context: Context) {
 
 fun List<Any>.removeBracket(): String{
     return toString().drop(1).dropLast(1)
+}
+fun String.convertIntoList(): List<String>{
+    if (this.contains("["))
+        return this.replace(" ","").replace("[","").replace("]","").split(',')
+    else throw (IOException("cannot convert non list string format into list"))
 }
 
 

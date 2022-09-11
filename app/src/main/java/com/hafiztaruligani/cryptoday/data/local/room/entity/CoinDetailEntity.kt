@@ -1,4 +1,4 @@
-package com.hafiztaruligani.cryptoday.data.local.entity
+package com.hafiztaruligani.cryptoday.data.local.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

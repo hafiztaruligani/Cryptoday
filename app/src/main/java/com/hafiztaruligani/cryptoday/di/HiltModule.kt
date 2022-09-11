@@ -2,17 +2,15 @@ package com.hafiztaruligani.cryptoday.di
 
 import android.content.Context
 import com.hafiztaruligani.cryptoday.BuildConfig
-import com.hafiztaruligani.cryptoday.data.DataStoreHelper
-import com.hafiztaruligani.cryptoday.data.local.AppDatabase
-import com.hafiztaruligani.cryptoday.data.local.CoinDao
-import com.hafiztaruligani.cryptoday.data.local.CoinRemoteKeyDao
+import com.hafiztaruligani.cryptoday.data.local.datastore.DataStoreHelper
+import com.hafiztaruligani.cryptoday.data.local.room.AppDatabase
+import com.hafiztaruligani.cryptoday.data.local.room.CoinDao
+import com.hafiztaruligani.cryptoday.data.local.room.CoinRemoteKeyDao
 import com.hafiztaruligani.cryptoday.data.remote.ApiService
 import com.hafiztaruligani.cryptoday.data.repository.CoinRepositoryImpl
 import com.hafiztaruligani.cryptoday.data.repository.UserRepositoryImpl
 import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
 import com.hafiztaruligani.cryptoday.domain.repository.UserRepository
-import com.hafiztaruligani.cryptoday.domain.repository.paging.CoinPagingRemoteMediator
-import com.hafiztaruligani.cryptoday.domain.usecase.GetCoinsUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -51,27 +49,24 @@ object HiltModule {
     fun provideCoinRepository(
         apiService: ApiService,
         coinDao: CoinDao,
-        coinRemoteKeyDao: CoinRemoteKeyDao
+        coinRemoteKeyDao: CoinRemoteKeyDao,
+        dataStoreHelper: DataStoreHelper
     ): CoinRepository{
         return CoinRepositoryImpl(
             apiService = apiService,
             coinDao = coinDao,
-            coinRemoteKeyDao = coinRemoteKeyDao
+            coinRemoteKeyDao = coinRemoteKeyDao,
+            dataStoreHelper = dataStoreHelper
         )
     }
 
     @Provides
     @Singleton
-    fun provideGetCoinsUseCase(
-        coinRepository: CoinRepository,
-        mediator: CoinPagingRemoteMediator
-    ): GetCoinsUseCase{
-        return GetCoinsUseCase(coinRepository, mediator)
-    }
+    fun provideUserRepository(dataStoreHelper: DataStoreHelper): UserRepository = UserRepositoryImpl(dataStoreHelper)
 
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =AppDatabase.getInstance(context)
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase = AppDatabase.getInstance(context)
 
     @Provides
     @Singleton
@@ -84,8 +79,4 @@ object HiltModule {
     @Provides
     @Singleton
     fun provideDataStoreHelper(@ApplicationContext context: Context): DataStoreHelper = DataStoreHelper(context)
-
-    @Provides
-    @Singleton
-    fun provideUserRepository(dataStoreHelper: DataStoreHelper): UserRepository = UserRepositoryImpl(dataStoreHelper)
 }

@@ -37,7 +37,6 @@ class CoinsAdapter (coinDiffUtil: CoinDiffUtil)
         holder.binding.apply {
 
             ViewCompat.setTransitionName(coinItem, "${position}_${coinData?.id}")
-            //setTransitionName(this, coinData,position)
 
             Glide.with(root.context)
                 .load(coinData?.image)
@@ -47,6 +46,8 @@ class CoinsAdapter (coinDiffUtil: CoinDiffUtil)
                 .into(logo)
 
             name.text = coinData?.getTitle()
+            name.isSelected = true
+
             currentPrice.text = marketData?.fiatFormat(marketData.currentPrice)
 
             priceChangePercentage.text = marketData?.percentageFormatter(
@@ -56,33 +57,10 @@ class CoinsAdapter (coinDiffUtil: CoinDiffUtil)
 
             root.setOnClickListener {
                 coinData?.id?.let { id->
-                    /*val extras = FragmentNavigatorExtras(coinItem to id)
-                    val action = CurrenciesFragmentDirections.actionCurrenciesFragmentToDetailFragment(coinData)
-                    Navigation.findNavController(coinItem).navigate(
-                        directions = action,
-                        navigatorExtras = extras
-                    )*/
                     onClickListener?.invoke(coinData, coinItem)
                 }
             }
         }
-
-
     }
-
-    private fun setTransitionName(binding: ItemCoinBinding, coinData: Coin?, position: Int) {
-        coinData?.let {
-            binding.apply {
-                ViewCompat.setTransitionName(logo, "logo$position")
-                ViewCompat.setTransitionName(name, "name$position")
-                ViewCompat.setTransitionName(currentPrice, "currentPrice$position")
-                ViewCompat.setTransitionName(textView2, "textView2$position")
-                ViewCompat.setTransitionName(priceChangePercentage, "priceChangePercentage$position")
-                ViewCompat.setTransitionName(btnFavourite, "btnFavourite$position")
-                ViewCompat.setTransitionName(bottomLine, "bottomLine$position")
-            }
-        }
-    }
-
 
 }

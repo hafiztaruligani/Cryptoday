@@ -23,4 +23,7 @@
     <string name="wait_server_limited">server calls have been restricted, wait for</string>
     <string name="network_unavailable">Somethings wrong, couldn\'t reach server,</string>
     <string name="this_data_is_not_up_to_date">this data is not up-to-date,</string>
+    <string name="sort_by">Sort By</string>
+    <string name="pair_currency">Pair Currency</string>
+    <string name="apply">Apply</string>
 </resources>

@@ -1,10 +1,11 @@
 package com.hafiztaruligani.cryptoday.data.remote.dto
 
+import android.util.Log
 import com.google.gson.annotations.SerializedName
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinEntity
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
 import com.hafiztaruligani.cryptoday.domain.model.Coin
-import com.hafiztaruligani.cryptoday.domain.model.CoinDetail
 import com.hafiztaruligani.cryptoday.domain.model.MarketData
+import com.hafiztaruligani.cryptoday.util.Cons
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -87,33 +88,21 @@ data class CoinResponse(
 	val currentPrice: Any? = null
 ){
 
-	fun toCoinEntity(coinId: String = ""): CoinEntity{
+	fun toCoinEntity(coinId: String = "", currencyPair: String): CoinEntity{
 		val coin =  CoinEntity(
 			coinId= coinId.ifBlank { id?:"" },
 			symbol= symbol?:"",
 			name= name?:"",
 			image= image?:"",
-			marketData = getMarketData()
+			marketData = getMarketData(currencyPair)
 		)
 		return coin
 	}
 
-
-	fun toCoin(): Coin{
-		val coin =  Coin(
-			id= id?:"",
-			symbol= symbol?:"",
-			name= name?:"",
-			image= image?:"",
-			marketData = getMarketData()
-		)
-		return coin
-	}
-
-	private fun getMarketData(): MarketData{
+	private fun getMarketData(currencyPair: String): MarketData{
 		return MarketData(
 			timeUnit= "24h", // TODO: declare time unit (24h, 1h, ...)
-			marketCapRank= marketCapRank?:-1,
+			marketCapRank= marketCapRank,
 			currentPrice= currentPrice?.toString()?.toDouble()?:0.0,
 			priceChangePercentage= marketCapChangePercentage24h?.toString()?.toDouble()?:0.0,
 			low= low24h?.toString()?.toDouble()?:0.0,
@@ -121,9 +110,9 @@ data class CoinResponse(
 			marketCap= marketCap?.toString()?.toDouble()?:0.0,
 			circulatingSupply= circulatingSupply?.toString()?.toDouble()?:0.0,
 			maxSupply= maxSupply?.toString()?.toDouble()?:0.0,
-			pair= "USD",
 			volume= totalVolume?.toString()?.toDouble()?:0.0,
-			lastUpdate= SimpleDateFormat("hh:mm:ss").format(Date())
+			lastUpdate= SimpleDateFormat("hh:mm:ss").format(Date()),
+			currencyPair = currencyPair
 		)
 
 	}

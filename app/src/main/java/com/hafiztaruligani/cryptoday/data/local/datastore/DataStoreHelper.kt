@@ -1,4 +1,4 @@
-package com.hafiztaruligani.cryptoday.data
+package com.hafiztaruligani.cryptoday.data.local.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore

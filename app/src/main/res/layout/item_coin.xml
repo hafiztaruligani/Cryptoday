@@ -31,7 +31,14 @@
         android:layout_marginStart="16dp"
         android:text="@string/text_view"
         app:layout_constraintStart_toEndOf="@+id/logo"
-        app:layout_constraintTop_toTopOf="@+id/logo" />
+        app:layout_constraintTop_toTopOf="@+id/logo"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        />
 
     <TextView
         android:id="@+id/current_price"

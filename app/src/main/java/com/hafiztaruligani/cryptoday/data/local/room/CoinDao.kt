@@ -1,21 +1,23 @@
-package com.hafiztaruligani.cryptoday.data.local
+package com.hafiztaruligani.cryptoday.data.local.room
 
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinDetailEntity
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinEntity
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinWithDetailEntity
-import com.hafiztaruligani.cryptoday.domain.model.Coin
-import com.hafiztaruligani.cryptoday.domain.model.CoinDetail
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinDetailEntity
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinWithDetailEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CoinDao {
 
     @Transaction
-    @Query("SELECT * FROM coin ORDER BY rank ASC")
+    @Query("SELECT * FROM coin")//" ORDER BY rank ASC")
     fun getAllCoins(): PagingSource<Int,CoinEntity>
+
+    @Transaction
+    @Query("SELECT * FROM coin WHERE coinId LIKE '%' || :params || '%' OR symbol LIKE '%' || :params || '%'")//" ORDER BY rank ASC")
+    fun getAllCoinsWithParams(params: String): PagingSource<Int,CoinEntity>
 
     @Transaction
     @Query("SELECT * FROM coin WHERE coinId=:coinId")

@@ -2,6 +2,7 @@ package com.hafiztaruligani.cryptoday.presentation.main
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -44,8 +45,15 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         supportActionBar?.hide()
+        viewModel.uiState.observe(this) {
+            // TODO: Loading splashscreen
+            if(it.data == true) setupBottomNav()
+            if(it.error.isNotBlank()){
+                Toast.makeText(this, it.error, Toast.LENGTH_LONG).show()
+                finish()
+            }
+        }
 
-        setupBottomNav()
         /*fragmentViewPager()
         fragmentNavigator()*/
 
@@ -109,6 +117,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        Log.d(Cons.TAG, "onDestroy: main")
+        super.onDestroy()
     }
 
     override fun onBackPressed() {

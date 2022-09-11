@@ -1,13 +1,13 @@
-package com.hafiztaruligani.cryptoday.data.local
+package com.hafiztaruligani.cryptoday.data.local.room
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinDetailEntity
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinEntity
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinRemoteKey
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinDetailEntity
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinRemoteKey
 
 @Database(
     entities = [
@@ -23,6 +23,7 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun coinRemoteKeyDao(): CoinRemoteKeyDao
 
     companion object{
-        fun getInstance(context: Context): AppDatabase = Room.databaseBuilder(context,AppDatabase::class.java, "coin_database").build()
+        fun getInstance(context: Context): AppDatabase = Room.databaseBuilder(context,
+            AppDatabase::class.java, "coin_database").build()
     }
 }

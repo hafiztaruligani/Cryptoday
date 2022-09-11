@@ -14,6 +14,6 @@
     <color name="edit_text_color">#1A2956</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="loading">#20646F85</color>
-
     <color name="favourite">#FF03DAC5</color>
+    <color name="blur_background">#400D1E4D</color>
 </resources>

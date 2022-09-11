@@ -1,8 +1,7 @@
-package com.hafiztaruligani.cryptoday.data.local.entity
+package com.hafiztaruligani.cryptoday.data.local.room.entity
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.hafiztaruligani.cryptoday.domain.model.Coin
 
 
 data class CoinWithDetailEntity(

@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hafiztaruligani.cryptoday.R
 import com.hafiztaruligani.cryptoday.databinding.FragmentCoinsListBinding
-import com.hafiztaruligani.cryptoday.presentation.LoadingBar
 import com.hafiztaruligani.cryptoday.presentation.adapters.CoinsAdapter
 import com.hafiztaruligani.cryptoday.presentation.adapters.PagingLoadStateAdapter
 import com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesFragmentDirections
@@ -26,17 +24,22 @@ import com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesViewModel
 import com.hafiztaruligani.cryptoday.util.CoinDiffUtil
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 
 
-class CoinsListFragment : Fragment() {
+class CoinsListFragment() : Fragment() {
 
+    val a = mutableListOf<String>()
     companion object {
-        fun newInstance() = CoinsListFragment().also {
-            Log.d(TAG, "newInstance: all ")
+        private const val listTypeArgs = "listType"
+        fun newInstance(listType: ListType) : CoinsListFragment {
+            val frag = CoinsListFragment()
+            val bundle = Bundle()
+            bundle.putParcelable(listTypeArgs, listType)
+            frag.arguments = bundle
+            return frag
         }
-        private lateinit var loading: LoadingBar
     }
 
 
@@ -57,7 +60,7 @@ class CoinsListFragment : Fragment() {
         binding = FragmentCoinsListBinding.inflate(layoutInflater)
 
         setupRc()
-        loading = LoadingBar(requireContext())
+
         return binding.root
     }
 
@@ -67,6 +70,7 @@ class CoinsListFragment : Fragment() {
         observeData()
         postponeEnterTransition()
         view.doOnPreDraw { startPostponedEnterTransition() }
+
         adapter.onClickListener = { coinData, viewItem->
             val extras = FragmentNavigatorExtras(viewItem to coinData.id)
             val action = CurrenciesFragmentDirections.actionCurrenciesFragmentToDetailFragment(coinData)
@@ -77,7 +81,6 @@ class CoinsListFragment : Fragment() {
         }
     }
 
-
     private fun setupRc() {
         coinsRc = binding.coinsRc
         layoutManager = LinearLayoutManager(context)
@@ -87,11 +90,37 @@ class CoinsListFragment : Fragment() {
         coinsRc.adapter = adapter.withLoadStateFooter(pagingLoadStateAdapter)
         binding.btnRetry.setOnClickListener { adapter.retry() }
 
-        lifecycleScope.launch {
-            adapter.loadStateFlow.collect(){
-                pagingLoadStateAdapter.loadState = it.mediator?.refresh ?:it.append
+        var initialLoad = true
+        var notScrolled = false
+        adapter.addOnPagesUpdatedListener {
+            if(adapter.itemCount>0 && initialLoad)//notScrolled)
+                coinsRc.scrollToPosition(0).also { initialLoad = false } // TODO: scroll
+        }
 
-                val isError = it.mediator?.refresh is LoadState.Error
+        /*coinsRc.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                notScrolled = dy == 0
+            }
+        })
+
+        adapter.addLoadStateListener {
+            if (it.source.refresh is LoadState.Loading)
+                Log.d(TAG, "loadstatelistener: new source")
+
+            if (it.mediator?.refresh is LoadState.Loading)
+                Log.d(TAG, "loadstatelistener: new mediator/remote")
+        }*/
+
+        lifecycleScope.launch {
+            adapter.loadStateFlow.combine(viewModel.loading){loadStates,loading->
+                Pair(loadStates,loading)
+            }.collect(){ pair->
+                val loadStates = pair.first
+                val loading = pair.second
+
+                pagingLoadStateAdapter.loadState = loadStates.mediator?.refresh ?:loadStates.append
+
+                val isError = loadStates.mediator?.refresh is LoadState.Error
 
                 binding.apply {
                     messageBackground.bringToFront()
@@ -103,37 +132,31 @@ class CoinsListFragment : Fragment() {
 
                     if(adapter.itemCount==0) message.text = context?.getString(R.string.network_unavailable)
                     else message.text = context?.getString(R.string.this_data_is_not_up_to_date)
+
+                    if (loadStates.source.refresh is LoadState.NotLoading && loadStates.append.endOfPaginationReached && adapter.itemCount < 1) {
+                        coinsRc.isVisible = false
+                        coinNotFound.isVisible = true
+                    } else {
+                        coinsRc.isVisible = true
+                        coinNotFound.isVisible = false
+                    }
                 }
 
-                when (val refresh = it.mediator?.refresh) {
-                    is LoadState.Loading -> Log.d(TAG, "setupRc refresh: loading")
-                    is LoadState.NotLoading -> Log.d(TAG, "setupRc refresh: not loading")
-                    is LoadState.Error -> {
-                        Log.d(TAG, "setupRc refresh: error : ${refresh.error}")
-                        //  pagingLoadStateAdapter.loadState = loadStates.refresh
-                    }
-                    else -> {}
-                }
-
-                when (val append = it.mediator?.append) {
-                    is LoadState.Loading -> Log.d(TAG, "setupRc append: loading")
-                    is LoadState.NotLoading -> Log.d(TAG, "setupRc append: not loading")
-                    is LoadState.Error -> {
-                        Log.d(TAG, "setupRc append: error : ${append.error}")
-                        //pagingLoadStateAdapter.loadState = append
-                    }
-                    else -> {}
-                }
             }
-
         }
     }
 
     private fun observeData() {
         lifecycleScope.launchWhenResumed{
-            viewModel.coins.collect() { data ->
-                adapter.submitData(data)
-            }
+            val listType = arguments?.getParcelable<ListType>(listTypeArgs)
+            if(listType == ListType.ALL)
+                viewModel.coins.collectLatest {
+                    adapter.submitData(it)
+                }
         }
+    }
+
+    fun scrollToTop(){
+        coinsRc.smoothScrollToPosition(0)
     }
 }

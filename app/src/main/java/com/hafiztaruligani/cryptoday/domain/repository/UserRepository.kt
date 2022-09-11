@@ -6,4 +6,6 @@ interface UserRepository {
     suspend fun setUserName(value: String)
     fun getUserName(): Flow<String>
 
+    suspend fun setUserCurrencyPair(value: String)
+    fun getUserCurrencyPair(): Flow<String>
 }

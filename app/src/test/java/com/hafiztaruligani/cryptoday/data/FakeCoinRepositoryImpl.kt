@@ -1,18 +1,5 @@
 package com.hafiztaruligani.cryptoday.data
 
-import androidx.paging.PagingData
-import androidx.paging.PagingSource
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinEntity
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinRemoteKey
-import com.hafiztaruligani.cryptoday.data.remote.dto.CoinResponse
-import com.hafiztaruligani.cryptoday.domain.model.Coin
-import com.hafiztaruligani.cryptoday.domain.model.CoinDetail
-import com.hafiztaruligani.cryptoday.domain.model.MarketData
-import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import java.util.*
-
 class FakeCoinRepositoryImpl{/*: CoinRepository {
 
 

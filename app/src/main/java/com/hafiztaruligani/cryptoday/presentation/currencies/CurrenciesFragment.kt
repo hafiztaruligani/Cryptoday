@@ -8,45 +8,44 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.hafiztaruligani.cryptoday.databinding.FragmentCurrenciesBinding
 import com.hafiztaruligani.cryptoday.presentation.adapters.FrameViewPagerAdapter
 import com.hafiztaruligani.cryptoday.presentation.currencies.coinslist.CoinsListFragment
+import com.hafiztaruligani.cryptoday.presentation.currencies.coinslist.ListType
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class CurrenciesFragment : Fragment() {
 
     companion object {
         fun newInstance() = CurrenciesFragment()
+        private val allCoinsListFragment = CoinsListFragment.newInstance(ListType.ALL)
+        private val favouriteCoinsListFragment = CoinsListFragment.newInstance(ListType.FAVOURITE)
+        private val settingsFragment = SettingsFragment()
     }
 
-    private val allCoinsListFragment = CoinsListFragment.newInstance()
-    private val favouriteCoinsListFragment = CoinsListFragment.newInstance()
-
-
-    lateinit var tabLayout : TabLayout
-    lateinit var viewPager : ViewPager2
-
+    private lateinit var tabLayout : TabLayout
+    private lateinit var viewPager : ViewPager2
 
     private val viewModel by activityViewModels<CurrenciesViewModel>()
     private lateinit var binding: FragmentCurrenciesBinding
 
-    lateinit var updateJob : Job
+    private lateinit var updateJob : Job
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         binding = FragmentCurrenciesBinding.inflate(layoutInflater)
-
-        /*val a = LinearLayoutManager(context)
-        val b = LinearLayoutManager(context)*/
-
 
         tabLayoutNavigator()
         viewPagerNavigator()
@@ -56,26 +55,24 @@ class CurrenciesFragment : Fragment() {
 
     private fun tabLayoutNavigator() {
         tabLayout = binding.tabLayout
-        tabLayout.addTab(tabLayout.newTab().setText("All"))
-        tabLayout.addTab(tabLayout.newTab().setText("Favourite"))
+        val tabAll = tabLayout.newTab().setText("All")
+        val tabFavourite = tabLayout.newTab().setText("Favourite")
+        tabLayout.addTab(tabAll)
+        tabLayout.addTab(tabFavourite)
         tabLayout.setSelectedTabIndicatorColor(Color.WHITE)
 
-
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                tab?.position?.let { id->
-                    viewPager.currentItem = id
-                    /*tab.view.setOnClickListener {
-                        when(id){
-                            0 && tabLayout.curren ->  a.scrollToPosition(0)
-                            1 ->  b.scrollToPosition(0)
-                        }
-                    }*/
-                }
-            }
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-        })
+        tabAll.view.setOnClickListener {
+            if(viewPager.currentItem==0)
+                allCoinsListFragment.scrollToTop()
+            else
+                viewPager.currentItem = 0
+        }
+        tabFavourite.view.setOnClickListener {
+            if(viewPager.currentItem==1)
+                favouriteCoinsListFragment.scrollToTop()
+            else
+                viewPager.currentItem = 1
+        }
     }
 
     private fun viewPagerNavigator() {
@@ -105,9 +102,31 @@ class CurrenciesFragment : Fragment() {
 
         postponeEnterTransition()
         view.doOnPreDraw { startPostponedEnterTransition() }
+
+        lifecycleScope.launchWhenResumed {
+            viewModel.loading.collect() {
+                Log.d(TAG, "loading currencies: $it ")
+                binding.searchImage.isVisible = !it
+                binding.searchLoading.isVisible = it
+            }
+        }
+
+        binding.apply {
+            btnClearText.isVisible = searchText.text.toString().isNotBlank()
+            searchText.addTextChangedListener() {
+                btnClearText.isVisible = it.toString().isNotBlank()
+                viewModel.postParams(it.toString())
+            }
+            btnClearText.setOnClickListener {
+                searchText.setText("")
+            }
+            btnSettings.setOnClickListener {
+                settingsFragment.show(parentFragmentManager, "SETTINGS_TAG")
+            }
+        }
+        lifecycleScope.launch(){viewModel.c.collect(){
+            Log.d(TAG, "exp: $it")
+        } }
     }
-
-
-
 
 }

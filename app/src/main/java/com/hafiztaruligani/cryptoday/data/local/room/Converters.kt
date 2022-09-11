@@ -1,4 +1,4 @@
-package com.hafiztaruligani.cryptoday.data.local
+package com.hafiztaruligani.cryptoday.data.local.room
 
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters

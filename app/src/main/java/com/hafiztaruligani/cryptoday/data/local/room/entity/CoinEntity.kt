@@ -1,4 +1,4 @@
-package com.hafiztaruligani.cryptoday.data.local.entity
+package com.hafiztaruligani.cryptoday.data.local.room.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -19,7 +19,7 @@ data class CoinEntity (
     @ColumnInfo(name = "market_data")
     val marketData: MarketData,
     @ColumnInfo(name = "rank")
-    val rank:Int= marketData.marketCapRank
+    val rank:Int?= marketData.marketCapRank
 ){
     init {
 

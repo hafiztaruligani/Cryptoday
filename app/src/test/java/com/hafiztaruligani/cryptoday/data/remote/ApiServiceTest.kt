@@ -63,7 +63,7 @@ class ApiServiceTest {
 
     @Test
     fun `search by params`() = runTest {
-        val result = apiService.search("bit")
+        val result = apiService.search("")
 
         result.coins?.forEach {
             println("${ it?.id } ${it?.marketCapRank}")

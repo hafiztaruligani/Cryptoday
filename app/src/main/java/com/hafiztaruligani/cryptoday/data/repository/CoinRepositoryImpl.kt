@@ -2,29 +2,45 @@ package com.hafiztaruligani.cryptoday.data.repository
 
 import android.util.Log
 import androidx.paging.*
-import com.hafiztaruligani.cryptoday.data.local.CoinDao
-import com.hafiztaruligani.cryptoday.data.local.CoinRemoteKeyDao
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinEntity
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinRemoteKey
-import com.hafiztaruligani.cryptoday.data.local.entity.CoinWithDetailEntity
+import com.hafiztaruligani.cryptoday.data.local.datastore.DataStoreHelper
+import com.hafiztaruligani.cryptoday.data.local.room.CoinDao
+import com.hafiztaruligani.cryptoday.data.local.room.CoinRemoteKeyDao
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinRemoteKey
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinWithDetailEntity
 import com.hafiztaruligani.cryptoday.data.remote.ApiService
 import com.hafiztaruligani.cryptoday.data.remote.dto.CoinResponse
-import com.hafiztaruligani.cryptoday.data.remote.dto.coindetail.CoinDetailResponse
 import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
+import com.hafiztaruligani.cryptoday.domain.usecase.CoinsOrder
 import com.hafiztaruligani.cryptoday.util.Cons
+import com.hafiztaruligani.cryptoday.util.Resource
+import com.hafiztaruligani.cryptoday.util.convertIntoList
+import com.hafiztaruligani.cryptoday.util.removeBracket
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 
 @OptIn(ExperimentalPagingApi::class)
-class CoinRepositoryImpl (
+class CoinRepositoryImpl(
     private val apiService: ApiService,
     private val coinDao: CoinDao,
-    private val coinRemoteKeyDao: CoinRemoteKeyDao
-): CoinRepository {
+    private val coinRemoteKeyDao: CoinRemoteKeyDao,
+    private val dataStoreHelper: DataStoreHelper
+) : CoinRepository {
 
-    override fun getCoinsPaged(): PagingSource<Int, CoinEntity> = coinDao.getAllCoins()
+    companion object{
+        private const val SUPPORTED_PAIR_KEY = "supported_pair_key"
+    }
 
-    override suspend fun getCoinWithDetail(coinId: String): Flow<CoinWithDetailEntity>{
+    override fun getCoinsPaged(coinsOrder: CoinsOrder): PagingSource<Int, CoinEntity> {
+        Log.d("TAG", "getCoinsPaged: $coinsOrder")
+        if (coinsOrder.ids.isEmpty() || coinsOrder.ids.first().isBlank())
+        return coinDao.getAllCoins()
+        return coinDao.getAllCoinsWithParams(coinsOrder.params)
+        // TODO: return sesuai ordernya
+    }
+
+    override suspend fun getCoinWithDetail(coinId: String): Flow<CoinWithDetailEntity> {
         val data = apiService.getCoinDetail(coinId).toCoinDetailEntity()
         coinDao.insertCoinDetail(data)
         return coinDao.getCoinWithDetailById(coinId)
@@ -39,15 +55,32 @@ class CoinRepositoryImpl (
     }
 
 
-    override suspend fun getCoinsFromNetwork(page: Int, pageSize: Int): List<CoinResponse>{
+    override suspend fun getCoinsFromNetwork(
+        page: Int,
+        pageSize: Int,
+        vsCurrencies: String,
+        sortBy: String,
+        ids: List<String>
+    ): List<CoinResponse> {
         Log.d(Cons.TAG, "load : net: $pageSize")
         return apiService.getCoinList(
-            vsCurrency = "USD",
-            order = "market_cap_desc",
+            vsCurrency = vsCurrencies,
+            order = sortBy,
             page = page,
             pageSize = pageSize,
-            ids =""
+            ids = ids.take(50).removeBracket()
         )
+    }
+
+    override suspend fun searchCoinId(params: String): List<String> {
+        val result = mutableListOf<String>()
+        val apiResult = apiService.search(params)
+        apiResult.coins?.forEach {
+            it?.id?.let { coinId ->
+                result.add(coinId)
+            }
+        }
+        return result
     }
 
 
@@ -62,6 +95,15 @@ class CoinRepositoryImpl (
 
     override suspend fun deleteCoinRemoteKey() {
         coinRemoteKeyDao.delete()
+    }
+
+    override suspend fun insertPair(){
+        val value = apiService.getSupportedPair()
+        dataStoreHelper.write(SUPPORTED_PAIR_KEY, value.toString())
+    }
+
+    override fun getCurrencyPair(): Flow<List<String>> {
+        return dataStoreHelper.read(SUPPORTED_PAIR_KEY, String::class.java).map { it.convertIntoList() }
     }
 
 }
