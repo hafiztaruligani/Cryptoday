@@ -20,8 +20,7 @@ import com.hafiztaruligani.cryptoday.presentation.currencies.coinslist.CoinsList
 import com.hafiztaruligani.cryptoday.presentation.currencies.coinslist.ListType
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CurrenciesFragment : Fragment() {
@@ -124,9 +123,6 @@ class CurrenciesFragment : Fragment() {
                 settingsFragment.show(parentFragmentManager, "SETTINGS_TAG")
             }
         }
-        lifecycleScope.launch(){viewModel.c.collect(){
-            Log.d(TAG, "exp: $it")
-        } }
     }
 
 }

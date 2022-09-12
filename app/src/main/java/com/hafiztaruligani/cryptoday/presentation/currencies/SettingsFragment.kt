@@ -2,7 +2,6 @@ package com.hafiztaruligani.cryptoday.presentation.currencies
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.RadioButton
 import androidx.fragment.app.DialogFragment
@@ -12,7 +11,6 @@ import com.hafiztaruligani.cryptoday.R
 import com.hafiztaruligani.cryptoday.databinding.FragmentSettingsBinding
 import com.hafiztaruligani.cryptoday.domain.usecase.SortBy
 import com.hafiztaruligani.cryptoday.presentation.adapters.PairAdapter
-import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -81,24 +79,21 @@ class SettingsFragment : DialogFragment() {
                 spinnerAdapter.notifyDataSetChanged()
 
                 withContext(Dispatchers.Main){
-                    Log.d(TAG, "coinsorder setting bind: is null ${coinsOrder==null} : ${it.second}")
-                    coinsOrder?.let {
-                        binding.sortBy.check(coinsOrder.sortBy.id)
-                        val index = currenciesPair.indexOf(coinsOrder.currencyPair)
-                        binding.spinner.setSelection(index)
-                        Log.d(TAG, "coinsorder setting bind index ${coinsOrder.currencyPair}: $index")
-                    }
+                    binding.sortBy.check(coinsOrder.sortBy.id)
+                    val index = currenciesPair.indexOf(coinsOrder.currencyPair)
+                    binding.spinner.setSelection(index)
                 }
             }
         }
         binding.btnApply.setOnClickListener { setResult() }
+
     }
 
     private fun setResult() {
         viewModel.postSortBy(
             binding.sortBy.checkedRadioButtonId
         )
-        viewModel.setUserCurrencyPair(
+        viewModel.postUserCurrencyPair(
             binding.spinner.selectedItem.toString()
         )
         dismiss()

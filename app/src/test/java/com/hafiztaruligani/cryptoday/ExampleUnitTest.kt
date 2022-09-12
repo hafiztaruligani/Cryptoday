@@ -1,17 +1,10 @@
 package com.hafiztaruligani.cryptoday
 
-import androidx.paging.map
-import com.hafiztaruligani.cryptoday.data.remote.ApiService
-import com.hafiztaruligani.cryptoday.data.repository.CoinRepositoryImpl
-import com.hafiztaruligani.cryptoday.domain.usecase.GetCoinsUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 import org.junit.Assert.*
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 /**
  * Example local unit test, which will execute on the development machine (host).

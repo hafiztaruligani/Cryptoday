@@ -1,6 +1,7 @@
 package com.hafiztaruligani.cryptoday.data.repository
 
 
+import android.util.Log
 import com.hafiztaruligani.cryptoday.data.local.datastore.DataStoreHelper
 import com.hafiztaruligani.cryptoday.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
@@ -30,13 +31,20 @@ class UserRepositoryImpl (private val dataStoreHelper: DataStoreHelper): UserRep
 
     override fun getUserCurrencyPair(): Flow<String> {
         var before = "usd" //also as default
+        var initial = true
         return flow {
             dataStoreHelper.read(USER_CURRENCY_PAIR, String::class.java).collect() {
-                if(it.isBlank()) emit(before)
+                if(it.isBlank()) emit(before).also { Log.d("TAG", "pair before getUserCurrencyPair: $before") }
                 else if (it!=before){
                     emit(it)
                     before = it
+                    Log.d("TAG", "pair it getUserCurrencyPair: $it")
+                }else if (initial){
+                    initial = false
+                    Log.d("TAG", " pair initial getUserCurrencyPair: $before || $it ")
+                    emit(before)
                 }
+
             }
         }
     }

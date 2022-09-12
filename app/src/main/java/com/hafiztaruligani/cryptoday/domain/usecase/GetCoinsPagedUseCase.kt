@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 
 @OptIn(ExperimentalPagingApi::class)
-class GetCoinsUseCase @Inject constructor(
+class GetCoinsPagedUseCase @Inject constructor(
     private val coinRepository: CoinRepository,
     val appDatabase: AppDatabase
 ) {

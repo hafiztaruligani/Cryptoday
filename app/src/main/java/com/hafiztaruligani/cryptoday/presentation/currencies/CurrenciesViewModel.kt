@@ -10,70 +10,39 @@ import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.io.Closeable
 import java.util.*
 import javax.inject.Inject
-import kotlin.random.Random
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CurrenciesViewModel @Inject constructor(
-    private val getCoinsUseCase: GetCoinsUseCase,
+    private val getCoinsUseCase: GetCoinsPagedUseCase,
     private val searchCoinIdUseCase: SearchCoinIdUseCase,
     private val getCurrenciesPairUseCase: GetCurrenciesPairUseCase,
     private val getUserCurrencyPairUseCase: GetUserCurrencyPairUseCase,
     private val setUserCurrencyPairUseCase: SetUserCurrencyPairUseCase
 ) : ViewModel() {
 
-    init {
-        viewModelScope.launch {
-            while (true){
-               // delay(2000)
-                //a.value = a.value+1
-                delay(2000)
-                b.value = ('a' until 'z').random().toString()
-            }
-        }
-    }
-
-    val a = flow{
-        repeat(1000){
-            delay(2000)
-            emit(it)
-        }
-    }//MutableStateFlow(1)
-    val b = MutableStateFlow("a")
-    val c = combine(a,b){a,b->Pair(a,b)}
-
-
     val currenciesPair = getCurrenciesPairUseCase.invoke()
-    val _coinsOrder: MutableStateFlow<CoinsOrder> = MutableStateFlow(CoinsOrder())
 
-    private val sortBy= MutableStateFlow(SortBy())
-    val coinsOrder = combine(sortBy,getUserCurrencyPairUseCase.invoke()){a,b ->
+    private val sortBy: MutableStateFlow<SortBy> = MutableStateFlow(SortBy.MARKET_CAP_DESC())
+    private val params: MutableStateFlow<String> = MutableStateFlow("")
+    val userCurrencyPair = getUserCurrencyPairUseCase.invoke()
 
-        val oldValue = _coinsOrder.value
-            CoinsOrder(
-                ids = oldValue.ids,
-                currencyPair = b,
-                sortBy = a,
-                params = oldValue.params
-            )
-
+    val coinsOrder = combine(sortBy,params,userCurrencyPair){a,b,c ->
+        Log.d(TAG, "pair: $c")
+        CoinsOrder(
+            ids = listOf(),
+            sortBy = a,
+            params = b,
+            currencyPair = c
+        )
     }.stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = CoinsOrder())
 
     var coins : Flow<PagingData<Coin>> = coinsOrder.flatMapLatest {
         getCoins(it)
     }
-
-/*
-val coins: Flow<PagingData<Coin>> = combine(getUserCurrencyPairUseCase.invoke(), coinsOrder){ a, b ->
-Pair(a,b)
-}.flatMapLatest {
-it.second.currencyPair = it.first
-getCoins(it.second)
-}.cachedIn(viewModelScope)*/
 
     private val _loading = MutableStateFlow(false)
     val loading : StateFlow<Boolean> = _loading
@@ -83,9 +52,7 @@ getCoins(it.second)
 
         if (order.params.isNotBlank()) try {
             order.ids = searchCoinIdUseCase.invoke(order.params).ifEmpty {
-                listOf(
-                    UUID.randomUUID().toString()
-                ) //randomUUID to trigger the pager to set not found
+                listOf( UUID.randomUUID().toString() ) //randomUUID to trigger the pager to set not found
             }
         } catch (e: Exception) {
         }
@@ -109,14 +76,7 @@ getCoins(it.second)
                 delay(2000)
             }
             yield()
-            _coinsOrder.value = CoinsOrder(
-                ids = _coinsOrder.value.ids,
-                currencyPair = _coinsOrder.value.currencyPair,
-                sortBy = _coinsOrder.value.sortBy,
-                params = value
-            )
-
-
+            params.value = value
         }
         loadingJob = viewModelScope.launch {
             delay(10000)
@@ -124,29 +84,12 @@ getCoins(it.second)
         }
     }
 
-    fun setUserCurrencyPair(value: String){
-
+    fun postUserCurrencyPair(value: String){
         setUserCurrencyPairUseCase.invoke(value)
-        /*_coinsOrder.value = CoinsOrder(
-                ids = _coinsOrder.value.ids,
-                currencyPair = value,
-                sortBy = _coinsOrder.value.sortBy,
-                params = _coinsOrder.value.params
-            )*/
-
     }
 
     fun postSortBy(id: Int){
-        val value = SortBy().getSortById(id)
-        if(_coinsOrder.value.sortBy != value) {
-            _coinsOrder.value = CoinsOrder(
-                ids = _coinsOrder.value.ids,
-                currencyPair = _coinsOrder.value.currencyPair,
-                sortBy = value,
-                params = _coinsOrder.value.params
-            )
-            Log.d(TAG, "postSortBy: ${_coinsOrder.value}")
-        }
+        if(sortBy.value.id != id)
         sortBy.value = SortBy().getSortById(id)
     }
 }

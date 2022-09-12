@@ -3,11 +3,10 @@ package com.hafiztaruligani.cryptoday.presentation.main
 import android.util.Log
 import androidx.lifecycle.*
 import com.hafiztaruligani.cryptoday.domain.model.Coin
-import com.hafiztaruligani.cryptoday.domain.usecase.GetCoinsUseCase
+import com.hafiztaruligani.cryptoday.domain.usecase.GetCoinsPagedUseCase
 import com.hafiztaruligani.cryptoday.domain.usecase.InitGlobalDataUseCase
 import com.hafiztaruligani.cryptoday.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -15,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val getCoinsUseCase: GetCoinsUseCase,
+    private val getCoinsUseCase: GetCoinsPagedUseCase,
     private val initGlobalDataUseCase: InitGlobalDataUseCase
 ): ViewModel() {
     init {
