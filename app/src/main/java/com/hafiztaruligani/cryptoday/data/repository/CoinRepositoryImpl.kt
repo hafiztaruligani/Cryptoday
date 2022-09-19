@@ -10,10 +10,11 @@ import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinRemoteKey
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinWithDetailEntity
 import com.hafiztaruligani.cryptoday.data.remote.ApiService
 import com.hafiztaruligani.cryptoday.data.remote.dto.CoinResponse
+import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
 import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
 import com.hafiztaruligani.cryptoday.domain.usecase.CoinsOrder
+import com.hafiztaruligani.cryptoday.domain.usecase.SortBy
 import com.hafiztaruligani.cryptoday.util.Cons
-import com.hafiztaruligani.cryptoday.util.Resource
 import com.hafiztaruligani.cryptoday.util.convertIntoList
 import com.hafiztaruligani.cryptoday.util.removeBracket
 import kotlinx.coroutines.flow.Flow
@@ -38,6 +39,12 @@ class CoinRepositoryImpl(
         return coinDao.getAllCoins()
         return coinDao.getAllCoinsWithParams(coinsOrder.params)
         // TODO: return sesuai ordernya
+    }
+
+    override suspend fun getCoin(coinId: String, currencyPair: String): Flow<CoinEntity> {
+        val data = getCoinsFromNetwork(1,1,currencyPair,SortBy.MARKET_CAP_DESC().apiString, listOf(coinId))
+        coinDao.insertCoins(data.map { it.toCoinEntity(currencyPair = currencyPair) })
+        return coinDao.getCoinById(coinId)
     }
 
     override suspend fun getCoinWithDetail(coinId: String): Flow<CoinWithDetailEntity> {
@@ -72,12 +79,19 @@ class CoinRepositoryImpl(
         )
     }
 
-    override suspend fun searchCoinId(params: String): List<String> {
-        val result = mutableListOf<String>()
+    override suspend fun searchCoinId(params: String): List<CoinSimple> {
+        val result = mutableListOf<CoinSimple>()
         val apiResult = apiService.search(params)
         apiResult.coins?.forEach {
-            it?.id?.let { coinId ->
-                result.add(coinId)
+            if(it?.thumb != null && it.id != null){
+                result.add(
+                    CoinSimple(
+                        id = it.id,
+                        logo = it.thumb,
+                        marketCapRank = it.marketCapRank?:9999,
+                        name = it.name?:it.id
+                    )
+                )
             }
         }
         return result

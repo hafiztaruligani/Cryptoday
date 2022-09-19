@@ -24,6 +24,7 @@ data class MarketData(
     var lastUpdate: String
 ) : Parcelable {
 
+    constructor():this("",null, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, "", "")
     companion object{
         private val formatter = NumberFormat.getCurrencyInstance()
     }
@@ -39,22 +40,6 @@ data class MarketData(
             return dropZero(result)
         }catch (e: Exception){
             return cryptoFormat(value, currencyPair)
-        }
-    }
-
-    fun fiatFormat(value: Any, n:Int): String{
-        if(n<1) throw Exception()
-        return try {
-            if(value.toString().toDouble()==0.0) return "-"
-
-            var patern = "###,##0."
-            repeat(n){ patern = patern.plus('0') }
-            val formatter = DecimalFormat(patern)
-            val result = "$ ${formatter.format(value)}" // TODO: currencies
-            return dropZero(result)
-        }catch (e: Exception){
-            Log.d("TAG", "currencyFormat: $e")
-            "-"
         }
     }
 

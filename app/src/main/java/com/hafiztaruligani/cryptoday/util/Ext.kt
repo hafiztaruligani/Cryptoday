@@ -5,8 +5,11 @@ import android.graphics.Color
 import android.text.SpannableString
 import android.text.TextPaint
 import android.text.style.URLSpan
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.hafiztaruligani.cryptoday.R
 import java.io.IOException
 
@@ -33,6 +36,12 @@ fun String.convertIntoList(): List<String>{
     else throw (IOException("cannot convert non list string format into list"))
 }
 
+fun ImageView.glide(context: Context, resource: Any){
+    Glide.with(context).load(resource)
+        .override(width, height)
+        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+        .into(this)
+}
 
 //fun Any?.toInt(): Int = this.toString().toInt()
 //fun Any?.toDouble(): Double = this.toString().toDouble()

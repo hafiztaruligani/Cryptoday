@@ -10,5 +10,8 @@ data class CoinsItem(
 	val marketCapRank: Int? = null,
 
 	@field:SerializedName("id")
-	val id: String? = null
+	val id: String? = null,
+
+	@field:SerializedName("large")
+	val thumb: String? = null
 )

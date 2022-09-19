@@ -7,6 +7,7 @@ import androidx.paging.cachedIn
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.usecase.*
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
+import com.hafiztaruligani.cryptoday.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -51,9 +52,13 @@ class CurrenciesViewModel @Inject constructor(
     private suspend fun getCoins(order: CoinsOrder): Flow<PagingData<Coin>> {
 
         if (order.params.isNotBlank()) try {
-            order.ids = searchCoinIdUseCase.invoke(order.params).ifEmpty {
+
+            val a = searchCoinIdUseCase.invoke(order.params).filter { it is Resource.Success  }.first()
+            if(a is Resource.Success) // TODO: manage error
+            order.ids = a.data.map { it.id }.ifEmpty {
                 listOf( UUID.randomUUID().toString() ) //randomUUID to trigger the pager to set not found
             }
+
         } catch (e: Exception) {
         }
         else {

@@ -34,14 +34,12 @@ class UserRepositoryImpl (private val dataStoreHelper: DataStoreHelper): UserRep
         var initial = true
         return flow {
             dataStoreHelper.read(USER_CURRENCY_PAIR, String::class.java).collect() {
-                if(it.isBlank()) emit(before).also { Log.d("TAG", "pair before getUserCurrencyPair: $before") }
+                if(it.isBlank()) emit(before)
                 else if (it!=before){
                     emit(it)
                     before = it
-                    Log.d("TAG", "pair it getUserCurrencyPair: $it")
                 }else if (initial){
                     initial = false
-                    Log.d("TAG", " pair initial getUserCurrencyPair: $before || $it ")
                     emit(before)
                 }
 

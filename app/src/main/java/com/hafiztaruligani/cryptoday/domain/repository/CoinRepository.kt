@@ -5,6 +5,8 @@ import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinRemoteKey
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinWithDetailEntity
 import com.hafiztaruligani.cryptoday.data.remote.dto.CoinResponse
+import com.hafiztaruligani.cryptoday.domain.model.Coin
+import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
 import com.hafiztaruligani.cryptoday.domain.usecase.CoinsOrder
 import com.hafiztaruligani.cryptoday.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +27,9 @@ interface CoinRepository {
           ids: List<String>
      ): List<CoinResponse>
 
-     suspend fun searchCoinId(params: String): List<String>
+     suspend fun searchCoinId(params: String): List<CoinSimple>
+
+     suspend fun getCoin(coinId: String, currencyPair: String): Flow<CoinEntity>
 
      suspend fun insertCoins(value: List<CoinEntity>)
      suspend fun deleteCoins()

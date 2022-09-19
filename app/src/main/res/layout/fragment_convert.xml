@@ -1,13 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".presentation.convert.ConvertFragment">
+    tools:context=".presentation.convert.ConvertFragment"
+    >
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewmodel"
+            type="com.hafiztaruligani.cryptoday.presentation.convert.ConverViewModel" />
+    </data>
 
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="fragment convert" />
+        android:background="@color/background"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp">
 
-</FrameLayout>
+        <TextView
+            android:id="@+id/textView13"
+            style="@style/font_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/convert"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+            android:id="@+id/coin1_auto_complete"
+            style="@style/font_medium"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/rounded_edit_text"
+            android:inputType="text"
+            android:paddingHorizontal="8dp"
+            android:text="@={viewmodel.coin1Param}"
+            android:maxLines="1"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView13"
+            />
+
+        <ImageView
+            android:id="@+id/logo1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:padding="4dp"
+            app:layout_constraintBottom_toBottomOf="@+id/coin1_auto_complete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/coin1_auto_complete" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/loading1"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/coin1_auto_complete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/coin1_auto_complete"
+            android:indeterminate="true"
+            android:visibility="gone"/>
+
+        <EditText
+            android:id="@+id/coin1_amount"
+            style="@style/font_medium"
+            android:layout_marginTop="16dp"
+            android:paddingHorizontal="8dp"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:background="@drawable/rounded_edit_text"
+            android:inputType="numberDecimal"
+            android:maxLength="20"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/coin1_auto_complete" />
+
+        <ImageView
+            android:layout_marginTop="16dp"
+            android:id="@+id/btn_swap"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:srcCompat="@drawable/ic_baseline_swap_vertical_circle_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/coin1_amount"
+            android:clickable="true"
+            android:focusable="true"
+            android:onClickListener="@{()-> viewmodel.swap()}"
+            />
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/coin2_auto_complete"
+            style="@style/font_medium"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_edit_text"
+            android:paddingHorizontal="8dp"
+            android:text="@={viewmodel.coin2Param}"
+            android:maxLines="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_swap"
+            />
+
+        <ImageView
+            android:id="@+id/logo2"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:padding="4dp"
+            app:layout_constraintBottom_toBottomOf="@+id/coin2_auto_complete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/coin2_auto_complete" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/loading2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/coin2_auto_complete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/coin2_auto_complete"
+            android:indeterminate="true"
+            android:visibility="gone"/>
+
+        <EditText
+            android:id="@+id/coin2_amount"
+            style="@style/font_medium"
+            android:layout_marginTop="16dp"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:paddingHorizontal="8dp"
+            android:inputType="numberDecimal"
+            android:maxLength="20"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:background="@drawable/rounded_edit_text"
+            app:layout_constraintTop_toBottomOf="@+id/coin2_auto_complete" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

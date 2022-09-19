@@ -3,8 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/hafiz/AppData/Local/Android/Sdk/platforms/android-32/data/res/layout/simple_dropdown_item_1line.xml" value="0.24427083333333333" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/drawable/ic_baseline_info_24.xml" value="0.26" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.3265" />
+        <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/drawable/ic_baseline_swap_vertical_circle_24.xml" value="0.26" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/drawable/ic_favourite_off.xml" value="0.282" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/drawable/ic_favourite_on.xml" value="0.282" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/drawable/ic_search.xml" value="0.3265" />
@@ -14,7 +16,7 @@
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_blank.xml" value="0.18802083333333333" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_coins_list.xml" value="0.33" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_conver.xml" value="0.2557291666666667" />
-        <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_convert.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_convert.xml" value="0.33" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_currencies.xml" value="0.36770833333333336" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_detail.xml" value="0.33" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_favourite_list.xml" value="0.33" />
@@ -23,6 +25,7 @@
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/fragment_settings.xml" value="0.5" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/frame_container.xml" value="0.2171875" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/item.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/item_autocomplete_coin.xml" value="0.365625" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/item_coin.xml" value="0.33" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/item_load_state.xml" value="0.5" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/layout/item_pair.xml" value="0.36666666666666664" />
