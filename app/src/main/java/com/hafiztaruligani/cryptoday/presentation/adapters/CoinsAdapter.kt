@@ -54,9 +54,10 @@ class CoinsAdapter (coinDiffUtil: CoinDiffUtil)
                 marketData.priceChangePercentage
             )
 
+            btnFavourite.setOnClickListener { Log.d(TAG, "btnfavo: clicked") }
 
             root.setOnClickListener {
-                coinData?.id?.let { id->
+                coinData?.id?.let {
                     onClickListener?.invoke(coinData, coinItem)
                 }
             }

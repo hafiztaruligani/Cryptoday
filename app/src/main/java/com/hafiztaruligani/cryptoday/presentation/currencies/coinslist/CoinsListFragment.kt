@@ -118,13 +118,16 @@ class CoinsListFragment() : Fragment() {
 
                 val isError = loadStates.mediator?.refresh is LoadState.Error
 
+                if(isError){
+                    Log.d(TAG, "iserror: ${(loadStates.mediator?.refresh as LoadState.Error).error}")}
+
                 binding.apply {
-                    messageBackground.bringToFront()
-                    message.bringToFront()
-                    btnRetry.bringToFront()
                     message.isVisible = isError
                     btnRetry.isVisible = isError
                     messageBackground.isVisible = isError
+                    messageBackground.bringToFront()
+                    message.bringToFront()
+                    btnRetry.bringToFront()
 
                     if(adapter.itemCount==0) message.text = context?.getString(R.string.network_unavailable)
                     else message.text = context?.getString(R.string.this_data_is_not_up_to_date)

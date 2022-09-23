@@ -75,7 +75,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_favourite_off" />
+        app:srcCompat="@drawable/ic_favourite_off"
+        android:clickable="true"
+        android:focusable="true"
+        />
 
     <View
         android:id="@+id/bottom_line"
