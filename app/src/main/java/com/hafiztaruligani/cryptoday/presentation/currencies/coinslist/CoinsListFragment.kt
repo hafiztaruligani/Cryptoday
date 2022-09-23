@@ -92,10 +92,11 @@ class CoinsListFragment() : Fragment() {
 
         var initialLoad = true
         var notScrolled = false
-        adapter.addOnPagesUpdatedListener {
-            if(adapter.itemCount>0 && initialLoad)//notScrolled)
+        /*adapter.addOnPagesUpdatedListener {
+            if(adapter.itemCount<=0) initialLoad = true.also { Log.d(TAG, "setupRc: initial") }
+            if(adapter.itemCount>0 && initialLoad)//notScrolled
                 coinsRc.scrollToPosition(0).also { initialLoad = false } // TODO: scroll
-        }
+        }*/
 
         /*coinsRc.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -112,12 +113,7 @@ class CoinsListFragment() : Fragment() {
         }*/
 
         lifecycleScope.launch {
-            adapter.loadStateFlow.combine(viewModel.loading){loadStates,loading->
-                Pair(loadStates,loading)
-            }.collect(){ pair->
-                val loadStates = pair.first
-                val loading = pair.second
-
+            adapter.loadStateFlow.collect(){ loadStates ->
                 pagingLoadStateAdapter.loadState = loadStates.mediator?.refresh ?:loadStates.append
 
                 val isError = loadStates.mediator?.refresh is LoadState.Error
@@ -149,10 +145,17 @@ class CoinsListFragment() : Fragment() {
     private fun observeData() {
         lifecycleScope.launchWhenResumed{
             val listType = arguments?.getParcelable<ListType>(listTypeArgs)
-            if(listType == ListType.ALL)
-                viewModel.coins.collectLatest {
-                    adapter.submitData(it)
+            launch {
+                if (listType == ListType.ALL) viewModel.coins.collectLatest {
+                        adapter.submitData(it)
+                    }
+            }
+            viewModel.needToScroll.collectLatest {
+                if(it) {
+                    binding.coinsRc.scrollToPosition(0)
+                    viewModel.alreadyScroll()
                 }
+            }
         }
     }
 

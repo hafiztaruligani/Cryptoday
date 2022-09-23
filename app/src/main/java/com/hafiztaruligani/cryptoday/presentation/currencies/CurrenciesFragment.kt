@@ -18,10 +18,10 @@ import com.hafiztaruligani.cryptoday.databinding.FragmentCurrenciesBinding
 import com.hafiztaruligani.cryptoday.presentation.adapters.FrameViewPagerAdapter
 import com.hafiztaruligani.cryptoday.presentation.currencies.coinslist.CoinsListFragment
 import com.hafiztaruligani.cryptoday.presentation.currencies.coinslist.ListType
+import com.hafiztaruligani.cryptoday.presentation.currencies.settings.SettingsFragment
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 class CurrenciesFragment : Fragment() {
 
@@ -103,10 +103,10 @@ class CurrenciesFragment : Fragment() {
         view.doOnPreDraw { startPostponedEnterTransition() }
 
         lifecycleScope.launchWhenResumed {
-            viewModel.loading.collect() {
+            viewModel.currenciesUiState.collect() {
                 Log.d(TAG, "loading currencies: $it ")
-                binding.searchImage.isVisible = !it
-                binding.searchLoading.isVisible = it
+                binding.searchImage.isVisible = !it.loading
+                binding.searchLoading.isVisible = it.loading
             }
         }
 
@@ -124,5 +124,7 @@ class CurrenciesFragment : Fragment() {
             }
         }
     }
+
+
 
 }

@@ -7,7 +7,7 @@
     android:background="@drawable/rounded_edit_text"
     android:backgroundTint="@color/background"
     android:padding="10dp"
-    tools:context=".presentation.currencies.SettingsFragment">
+    tools:context=".presentation.currencies.settings.SettingsFragment">
 
     <!--<ImageView
         android:id="@+id/btn_close"

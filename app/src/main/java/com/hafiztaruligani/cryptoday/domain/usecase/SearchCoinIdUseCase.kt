@@ -4,6 +4,7 @@ import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
 import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
 import com.hafiztaruligani.cryptoday.util.Resource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
@@ -15,16 +16,16 @@ class SearchCoinIdUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(params: String): Flow<Resource<List<CoinSimple>>> = flow {
         emit(Resource.Loading())
-        try {
+        /*try {*/
             coinRepository.insertPair()
             emit(Resource.Success(coinRepository.searchCoinId(params)))
-        }catch (e: HttpException){
+        /*}catch (e: HttpException){
             emit(Resource.Error())
         }catch (e: IOException){
             emit(Resource.Error())
         }catch (e: Exception){
             emit(Resource.Error())
         }
-
-    }
+*/
+    }.catch { emit(Resource.Error()) }
 }

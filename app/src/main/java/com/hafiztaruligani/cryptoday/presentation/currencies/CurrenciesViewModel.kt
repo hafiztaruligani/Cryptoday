@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.usecase.*
+import com.hafiztaruligani.cryptoday.presentation.currencies.settings.SettingUiState
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import com.hafiztaruligani.cryptoday.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +16,7 @@ import java.util.*
 import javax.inject.Inject
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class CurrenciesViewModel @Inject constructor(
     private val getCoinsUseCase: GetCoinsPagedUseCase,
@@ -24,14 +25,13 @@ class CurrenciesViewModel @Inject constructor(
     private val getUserCurrencyPairUseCase: GetUserCurrencyPairUseCase,
     private val setUserCurrencyPairUseCase: SetUserCurrencyPairUseCase
 ) : ViewModel() {
-
     val currenciesPair = getCurrenciesPairUseCase.invoke()
 
     private val sortBy: MutableStateFlow<SortBy> = MutableStateFlow(SortBy.MARKET_CAP_DESC())
     private val params: MutableStateFlow<String> = MutableStateFlow("")
     val userCurrencyPair = getUserCurrencyPairUseCase.invoke()
 
-    val coinsOrder = combine(sortBy,params,userCurrencyPair){a,b,c ->
+    val coinsOrder = combine(sortBy,params.debounce(2000),userCurrencyPair){ a, b, c ->
         Log.d(TAG, "pair: $c")
         CoinsOrder(
             ids = listOf(),
@@ -42,50 +42,43 @@ class CurrenciesViewModel @Inject constructor(
     }.stateIn(scope = viewModelScope, started = SharingStarted.Lazily, initialValue = CoinsOrder())
 
     var coins : Flow<PagingData<Coin>> = coinsOrder.flatMapLatest {
-        getCoins(it)
+        try{
+            getCoins(it)
+        }finally {
+            _loading.value = false
+            _needToScroll.value = true
+        }
     }
 
+    private val _needToScroll = MutableStateFlow(false)
+    val needToScroll: StateFlow<Boolean> = _needToScroll
+    fun alreadyScroll(){ _needToScroll.value = false }
+
     private val _loading = MutableStateFlow(false)
-    val loading : StateFlow<Boolean> = _loading
-    fun postLoad(value: Boolean){ _loading.value = value }
+
+    val settingUiState = combine(currenciesPair, coinsOrder){ a,b -> SettingUiState(a,b) }
+    val currenciesUiState = _loading.map { CurrenciesUiState(it) }
 
     private suspend fun getCoins(order: CoinsOrder): Flow<PagingData<Coin>> {
+        if (order.params.isNotBlank())  {
+            val a = searchCoinIdUseCase.invoke(order.params).filter { it is Resource.Success  }.last()
 
-        if (order.params.isNotBlank()) try {
-
-            val a = searchCoinIdUseCase.invoke(order.params).filter { it is Resource.Success  }.first()
             if(a is Resource.Success) // TODO: manage error
-            order.ids = a.data.map { it.id }.ifEmpty {
-                listOf( UUID.randomUUID().toString() ) //randomUUID to trigger the pager to set not found
-            }
-
-        } catch (e: Exception) {
+                order.ids = a.data.map { it.id }.ifEmpty {
+                    listOf( UUID.randomUUID().toString() ) //randomUUID to trigger the pager to set not found
+                }
         }
         else {
             order.ids = listOf()
         }
-        _loading.value = false
-        Log.d(TAG, "coinsorder: $order")
         return getCoinsUseCase.invoke(order).cachedIn(viewModelScope)
 
     }
 
-    var job: Job? = null
-    var loadingJob: Job?=null
-    fun postParams(value: String){
-        job?.cancel()
-        loadingJob?.cancel()
-        job = viewModelScope.launch {
-            if (value.isNotBlank()) {
-                _loading.value = true
-                delay(2000)
-            }
-            yield()
+    fun postParams(value: String) {
+        if(params.value != value) {
             params.value = value
-        }
-        loadingJob = viewModelScope.launch {
-            delay(10000)
-            _loading.value = false
+            _loading.value = true
         }
     }
 
@@ -95,7 +88,7 @@ class CurrenciesViewModel @Inject constructor(
 
     fun postSortBy(id: Int){
         if(sortBy.value.id != id)
-        sortBy.value = SortBy().getSortById(id)
+            sortBy.value = SortBy().getSortById(id)
     }
 }
 

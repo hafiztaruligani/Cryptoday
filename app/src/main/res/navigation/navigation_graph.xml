@@ -73,7 +73,7 @@
         tools:layout="@layout/fragment_login" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.hafiztaruligani.cryptoday.presentation.currencies.SettingsFragment"
+        android:name="com.hafiztaruligani.cryptoday.presentation.currencies.settings.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
 </navigation>

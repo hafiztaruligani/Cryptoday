@@ -1,4 +1,4 @@
-package com.hafiztaruligani.cryptoday.presentation.currencies
+package com.hafiztaruligani.cryptoday.presentation.currencies.settings
 
 import android.graphics.Color
 import android.os.Bundle
@@ -11,6 +11,7 @@ import com.hafiztaruligani.cryptoday.R
 import com.hafiztaruligani.cryptoday.databinding.FragmentSettingsBinding
 import com.hafiztaruligani.cryptoday.domain.usecase.SortBy
 import com.hafiztaruligani.cryptoday.presentation.adapters.PairAdapter
+import com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -69,11 +70,9 @@ class SettingsFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launchWhenResumed {
 
-            combine(viewModel.currenciesPair,viewModel.coinsOrder){ a,b ->
-                Pair(a,b)
-            }.collectLatest {
-                val currenciesPair = it.first
-                val coinsOrder = it.second
+            viewModel.settingUiState.collectLatest {
+                val currenciesPair = it.currenciespair
+                val coinsOrder = it.coinsOrder
 
                 spinnerAdapter.pairs = currenciesPair.toMutableList()
                 spinnerAdapter.notifyDataSetChanged()
