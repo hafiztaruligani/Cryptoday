@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/hafiz/AppData/Local/Android/Sdk/platforms/android-32/data/res/layout/simple_dropdown_item_1line.xml" value="0.24427083333333333" />
+        <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/drawable/ic_baseline_arrow_drop_down_24.xml" value="0.2605" />
+        <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/drawable/ic_baseline_arrow_drop_up_24.xml" value="0.2605" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/drawable/ic_baseline_info_24.xml" value="0.26" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.3265" />
         <entry key="..\:/Users/hafiz/Documents/Projects/Cryptoday/app/src/main/res/drawable/ic_baseline_swap_vertical_circle_24.xml" value="0.26" />

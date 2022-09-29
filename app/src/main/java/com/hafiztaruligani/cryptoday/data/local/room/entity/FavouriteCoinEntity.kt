@@ -6,9 +6,10 @@ import androidx.room.PrimaryKey
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.model.MarketData
 
-@Entity(tableName = "coin")
-data class CoinEntity (
+@Entity(tableName = "favourite")
+data class FavouriteCoinEntity(
     @PrimaryKey(autoGenerate = false)
+    @ColumnInfo(name = "coin_id")
     val coinId: String,
     @ColumnInfo(name = "symbol")
     val symbol: String,
@@ -23,7 +24,7 @@ data class CoinEntity (
     @ColumnInfo(name = "favourite")
     val favourite: Boolean
 ){
-    fun toCoin():Coin= Coin(
+    fun toCoin(): Coin = Coin(
         id=coinId,
         symbol=symbol,
         name=name,

@@ -1,44 +1,87 @@
 package com.hafiztaruligani.cryptoday.data.repository
 
 import android.util.Log
-import androidx.paging.*
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.PagingSource
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.hafiztaruligani.cryptoday.BuildConfig
 import com.hafiztaruligani.cryptoday.data.local.datastore.DataStoreHelper
 import com.hafiztaruligani.cryptoday.data.local.room.CoinDao
 import com.hafiztaruligani.cryptoday.data.local.room.CoinRemoteKeyDao
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinRemoteKey
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinWithDetailEntity
+import com.hafiztaruligani.cryptoday.data.local.room.entity.FavouriteCoinEntity
 import com.hafiztaruligani.cryptoday.data.remote.ApiService
 import com.hafiztaruligani.cryptoday.data.remote.dto.CoinResponse
+import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
 import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
+import com.hafiztaruligani.cryptoday.domain.repository.UserRepository
 import com.hafiztaruligani.cryptoday.domain.usecase.CoinsOrder
 import com.hafiztaruligani.cryptoday.domain.usecase.SortBy
 import com.hafiztaruligani.cryptoday.util.Cons
+import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import com.hafiztaruligani.cryptoday.util.convertIntoList
 import com.hafiztaruligani.cryptoday.util.removeBracket
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
+import java.io.IOException
 
 
-@OptIn(ExperimentalPagingApi::class)
+@OptIn(ExperimentalPagingApi::class, ExperimentalCoroutinesApi::class)
 class CoinRepositoryImpl(
     private val apiService: ApiService,
     private val coinDao: CoinDao,
     private val coinRemoteKeyDao: CoinRemoteKeyDao,
-    private val dataStoreHelper: DataStoreHelper
+    private val dataStoreHelper: DataStoreHelper,
+    private val userRepository: UserRepository,
+    private val firestore: FirebaseFirestore
 ) : CoinRepository {
 
     companion object{
         private const val SUPPORTED_PAIR_KEY = "supported_pair_key"
+        private const val FAVOURITE_KEY = "FAVOURITE_KEY"
     }
+
+    init {
+        runBlocking(Dispatchers.IO) {
+            try {
+                val favouriteCoins = downloadFavouriteCoin()
+                val pair = userRepository.getUserCurrencyPair().first()
+                if (favouriteCoins.isNotEmpty()) {
+                    getCoinsFromNetwork(
+                        page = 1,
+                        pageSize = favouriteCoins.size,
+                        vsCurrencies = pair,
+                        sortBy = SortBy.MARKEY_CAP_ASC().apiString,
+                        favouriteCoins
+                    ).forEach {
+                        val data = it.toCoinEntity(currencyPair = pair).toCoin()
+                        data.favourite = true
+                        addFavourite(data)
+                    }
+                } else {
+                    Log.e(TAG, "repo init: user not login")
+                }
+            }catch (e: Exception){
+                Log.e(TAG, "repo init: ${e.message}")
+            }
+        }
+    }
+
+    private var initiate = true
+
 
     override fun getCoinsPaged(coinsOrder: CoinsOrder): PagingSource<Int, CoinEntity> {
         Log.d("TAG", "getCoinsPaged: $coinsOrder")
         if (coinsOrder.ids.isEmpty() || coinsOrder.ids.first().isBlank())
-        return coinDao.getAllCoins()
+            return coinDao.getAllCoins()
         return coinDao.getAllCoinsWithParams(coinsOrder.params)
-        // TODO: return sesuai ordernya
     }
 
     override suspend fun getCoin(coinId: String, currencyPair: String): Flow<CoinEntity> {
@@ -61,6 +104,73 @@ class CoinRepositoryImpl(
         coinDao.delete()
     }
 
+    override fun getFavourite(coinsOrder: CoinsOrder): Flow<List<FavouriteCoinEntity>> {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val favouriteList = coinDao.getAllFavourite().first().map { it.coinId }
+
+                val newData = getCoinsFromNetwork(
+                    page = 1,
+                    pageSize = favouriteList.size,
+                    ids = favouriteList,
+                    vsCurrencies = coinsOrder.currencyPair,
+                    sortBy = coinsOrder.sortBy.apiString
+                )
+                newData.map { it.toCoinEntity(currencyPair = coinsOrder.currencyPair).toCoin().toFavouriteCoinEntity() }.forEach {
+                    coinDao.insertFavouriteCoin(it)
+                }
+            }catch (e: Exception){
+                Log.e(TAG, "getFavourite: ${e.message}") }
+        }
+
+        return coinDao.getAllFavourite()
+    }
+
+    override suspend fun addFavourite(coin: Coin) {
+        coinDao.updateCoinFavourite(coin.id, true)
+        coinDao.insertFavouriteCoin(coin.toFavouriteCoinEntity())
+        uploadFavouriteCoins(
+            coinDao.getAllFavourite().first()
+        )
+    }
+
+    override suspend fun deleteFavourite(coinId: String) {
+        coinDao.updateCoinFavourite(coinId, false)
+        coinDao.deleteFavouriteById(coinId)
+    }
+
+    private suspend fun uploadFavouriteCoins(coins: List<FavouriteCoinEntity>){
+            try {
+                val userKey = userRepository.getUserName().first()
+                if(userKey.isNotEmpty()) {
+                    val data = coins.map { coins-> coins.coinId }.toString()
+                    firestore.collection(BuildConfig.FIRESTORE_COLLECTION).document(userKey)
+                        .set(hashMapOf(FAVOURITE_KEY to data))
+                        .addOnFailureListener { e ->
+                            throw (e)
+                        }
+                }
+                else throw (IOException("user not login"))
+
+            }catch (e: Exception){
+                Log.e(TAG, "uploadFavouriteCoins: ${e.message}")
+            }
+    }
+
+    private suspend fun downloadFavouriteCoin(): List<String>{
+        return try {
+            val userKey = userRepository.getUserName().first()
+            if(userKey.isNotEmpty()) {
+                val result = firestore.collection(BuildConfig.FIRESTORE_COLLECTION).document(userKey).get().await()
+                val data = result[FAVOURITE_KEY]
+                (data as String).convertIntoList()
+            } else throw (IOException("user not login"))
+
+        }catch (e: Exception){
+            Log.e(TAG, "uploadFavouriteCoins: ${e.message}")
+            listOf()
+        }
+    }
 
     override suspend fun getCoinsFromNetwork(
         page: Int,
@@ -70,14 +180,22 @@ class CoinRepositoryImpl(
         ids: List<String>
     ): List<CoinResponse> {
         Log.d(Cons.TAG, "load : net: $pageSize")
-        return apiService.getCoinList(
+        val data =  apiService.getCoinList(
             vsCurrency = vsCurrencies,
             order = sortBy,
             page = page,
             pageSize = pageSize,
             ids = ids.take(50).removeBracket()
         )
+        val favouriteId: List<String> = coinDao.getAllFavourite().first().map { it.coinId }
+        data.forEach {
+            if(favouriteId.contains(it.id))
+                it.favourite = true
+        }
+        return data
     }
+
+
 
     override suspend fun searchCoinId(params: String): List<CoinSimple> {
         val result = mutableListOf<CoinSimple>()
@@ -88,7 +206,7 @@ class CoinRepositoryImpl(
                     CoinSimple(
                         id = it.id,
                         logo = it.thumb,
-                        marketCapRank = it.marketCapRank?:9999,
+                        marketCapRank = it.marketCapRank?:19999,
                         name = it.name?:it.id
                     )
                 )

@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.hafiztaruligani.cryptoday.domain.model.CoinDetail
 
-@Entity
+@Entity(tableName = "coin_detail")
 data class CoinDetailEntity (
     @PrimaryKey(autoGenerate = false)
     val coinId: String,

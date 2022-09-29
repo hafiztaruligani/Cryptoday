@@ -85,7 +85,9 @@ data class CoinResponse(
 	val maxSupply: Any? = null,
 
 	@field:SerializedName("current_price")
-	val currentPrice: Any? = null
+	val currentPrice: Any? = null,
+
+	var favourite: Boolean = false
 ){
 
 	fun toCoinEntity(coinId: String = "", currencyPair: String): CoinEntity{
@@ -94,7 +96,8 @@ data class CoinResponse(
 			symbol= symbol?:"",
 			name= name?:"",
 			image= image?:"",
-			marketData = getMarketData(currencyPair)
+			marketData = getMarketData(currencyPair),
+			favourite = favourite
 		)
 		return coin
 	}

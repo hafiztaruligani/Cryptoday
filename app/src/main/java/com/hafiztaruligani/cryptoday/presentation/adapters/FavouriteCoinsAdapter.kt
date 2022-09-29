@@ -1,13 +1,12 @@
 package com.hafiztaruligani.cryptoday.presentation.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
-import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -17,29 +16,26 @@ import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.util.CoinDiffUtil
 import com.hafiztaruligani.cryptoday.util.glide
 
-class CoinsAdapter(
-    coinDiffUtil: CoinDiffUtil,
+class FavouriteCoinsAdapter(
+    private val coinDiffUtil: CoinDiffUtil,
     private val coinDetailClick: (Coin, View) -> Unit,
-    private val favouriteClick: ((Coin) -> Boolean)
-)
-    :PagingDataAdapter<Coin, CoinsAdapter.CoinViewHolder>(coinDiffUtil) {
+    private val favouriteClick: (Coin) -> Boolean
+): RecyclerView.Adapter<FavouriteCoinsAdapter.ViewHolder>() {
 
-    inner class CoinViewHolder(val binding: ItemCoinBinding) : RecyclerView.ViewHolder(binding.root)
+    val list = AsyncListDiffer(this, coinDiffUtil)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CoinViewHolder {
-        return CoinViewHolder(
-            ItemCoinBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-        )
+    class ViewHolder(val binding: ItemCoinBinding): RecyclerView.ViewHolder(binding.root) {
+
     }
 
-    override fun onBindViewHolder(holder: CoinViewHolder, position: Int) {
-        val coinData = getItem(position)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder(ItemCoinBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val coinData = list.currentList[position]
         val marketData = coinData?.marketData
-        holder.binding.apply {
+        holder.binding.apply{
 
             ViewCompat.setTransitionName(coinItem, "${position}_${coinData?.id}")
 
@@ -55,6 +51,10 @@ class CoinsAdapter(
 
             currentPrice.text = marketData?.fiatFormat(marketData.currentPrice)
 
+            priceChangePercentage.text = marketData?.percentageFormatter(
+                marketData.priceChangePercentage
+            )
+
             coinData?.marketData?.priceChangePercentage?.let {
                 if(it>=0) {
                     iconArrow.glide(root.context, R.drawable.ic_baseline_arrow_drop_up_24)
@@ -64,11 +64,6 @@ class CoinsAdapter(
                     priceChangePercentage.setTextColor(ContextCompat.getColor(root.context, R.color.down))
                 }
             }
-
-            priceChangePercentage.text = marketData?.percentageFormatter(
-                marketData.priceChangePercentage
-            )?.apply { if (length > 1) replace("-","") }
-
 
             coinData?.id?.let {
 
@@ -97,4 +92,7 @@ class CoinsAdapter(
         else btnFavourite.glide(btnFavourite.context, R.drawable.ic_favourite_off)
     }
 
+    override fun getItemCount(): Int {
+        return list.currentList.size
+    }
 }

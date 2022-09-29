@@ -16,4 +16,6 @@
     <color name="loading">#20646F85</color>
     <color name="favourite">#FF03DAC5</color>
     <color name="blur_background">#400D1E4D</color>
+    <color name="up">#06DF23</color>
+    <color name="down">#DF1C1C</color>
 </resources>

@@ -1,6 +1,8 @@
 package com.hafiztaruligani.cryptoday.di
 
 import android.content.Context
+import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.hafiztaruligani.cryptoday.BuildConfig
 import com.hafiztaruligani.cryptoday.data.local.datastore.DataStoreHelper
 import com.hafiztaruligani.cryptoday.data.local.room.AppDatabase
@@ -50,13 +52,17 @@ object HiltModule {
         apiService: ApiService,
         coinDao: CoinDao,
         coinRemoteKeyDao: CoinRemoteKeyDao,
-        dataStoreHelper: DataStoreHelper
+        dataStoreHelper: DataStoreHelper,
+        userRepository: UserRepository,
+        firestore: FirebaseFirestore
     ): CoinRepository{
         return CoinRepositoryImpl(
             apiService = apiService,
             coinDao = coinDao,
             coinRemoteKeyDao = coinRemoteKeyDao,
-            dataStoreHelper = dataStoreHelper
+            dataStoreHelper = dataStoreHelper,
+            userRepository = userRepository,
+            firestore = firestore
         )
     }
 
@@ -79,4 +85,10 @@ object HiltModule {
     @Provides
     @Singleton
     fun provideDataStoreHelper(@ApplicationContext context: Context): DataStoreHelper = DataStoreHelper(context)
+
+    @Provides
+    @Singleton
+    fun provideFirestore(@ApplicationContext context: Context): FirebaseFirestore {
+        context.apply { return FirebaseFirestore.getInstance() }
+    }
 }

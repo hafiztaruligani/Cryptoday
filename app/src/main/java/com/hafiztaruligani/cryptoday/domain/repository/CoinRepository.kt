@@ -4,11 +4,11 @@ import androidx.paging.PagingSource
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinRemoteKey
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinWithDetailEntity
+import com.hafiztaruligani.cryptoday.data.local.room.entity.FavouriteCoinEntity
 import com.hafiztaruligani.cryptoday.data.remote.dto.CoinResponse
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
 import com.hafiztaruligani.cryptoday.domain.usecase.CoinsOrder
-import com.hafiztaruligani.cryptoday.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface CoinRepository {
@@ -42,4 +42,7 @@ interface CoinRepository {
      suspend fun insertPair()
      fun getCurrencyPair(): Flow<List<String>>
 
+    fun getFavourite(coinsOrder: CoinsOrder): Flow<List<FavouriteCoinEntity>>
+     suspend fun addFavourite(coin: Coin)
+     suspend fun deleteFavourite(coinId: String)
 }

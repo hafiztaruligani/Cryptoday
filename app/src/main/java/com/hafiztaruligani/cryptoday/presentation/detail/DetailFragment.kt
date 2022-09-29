@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -25,7 +26,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.hafiztaruligani.cryptoday.databinding.FragmentDetailBinding
 import com.hafiztaruligani.cryptoday.domain.model.MarketData
 import com.hafiztaruligani.cryptoday.presentation.LoadingBar
+import com.hafiztaruligani.cryptoday.presentation.main.MainActivity
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
+import com.hafiztaruligani.cryptoday.util.glide
 import com.hafiztaruligani.cryptoday.util.removeLinksUnderline
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -110,12 +113,23 @@ class DetailFragment() : Fragment() {
             }
             data.data?.let {
                 setLoadingBackground()
+                val coin = it.coin
                 val marketData = it.coin.marketData
                 val coinDetail = it.detail
+
                 binding.apply {
 
                     currentPrice.text = marketData.fiatFormat(marketData.currentPrice)
 
+                    marketData.priceChangePercentage.let { p->
+                        if(p>=0) {
+                            iconArrow.glide(root.context, com.hafiztaruligani.cryptoday.R.drawable.ic_baseline_arrow_drop_up_24)
+                            priceChangePercentage.setTextColor(ContextCompat.getColor(root.context, com.hafiztaruligani.cryptoday.R.color.up))
+                        }else{
+                            iconArrow.glide(root.context, com.hafiztaruligani.cryptoday.R.drawable.ic_baseline_arrow_drop_down_24)
+                            priceChangePercentage.setTextColor(ContextCompat.getColor(root.context, com.hafiztaruligani.cryptoday.R.color.down))
+                        }
+                    }
                     priceChangePercentage.text = marketData.percentageFormatter(
                         marketData.priceChangePercentage
                     )
@@ -145,10 +159,31 @@ class DetailFragment() : Fragment() {
                         description.text = desc
                         description.removeLinksUnderline(root.context)
                     }
+
+
+                    setFavourite(btnFavourite, coin.favourite)
+
+
+                    btnFavourite.setOnClickListener {
+                        coin.favourite = !coin.favourite
+
+                        val isSuccess = viewModel.favouriteEvent(coin)
+                        if(isSuccess) setFavourite(btnFavourite, coin.favourite)
+                        else {
+                            (activity as MainActivity).login()
+                            coin.favourite = !coin.favourite
+                        }
+                    }
+
                 }
             }
         }
 
+    }
+
+    private fun setFavourite(btnFavourite: ImageView, favourite: Boolean) {
+        if (favourite) btnFavourite.glide(btnFavourite.context, com.hafiztaruligani.cryptoday.R.drawable.ic_favourite_on)
+        else btnFavourite.glide(btnFavourite.context, com.hafiztaruligani.cryptoday.R.drawable.ic_favourite_off)
     }
 
     private fun setupSlider() {

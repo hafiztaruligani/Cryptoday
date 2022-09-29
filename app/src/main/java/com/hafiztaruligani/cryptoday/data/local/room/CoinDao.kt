@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy.REPLACE
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinDetailEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinWithDetailEntity
-import com.hafiztaruligani.cryptoday.domain.model.Coin
+import com.hafiztaruligani.cryptoday.data.local.room.entity.FavouriteCoinEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -37,4 +37,20 @@ interface CoinDao {
 
     @Query("DELETE FROM coin")
     suspend fun delete()
+
+    @Query("SELECT * FROM favourite")
+    fun getAllFavourite(): Flow<List<FavouriteCoinEntity>>
+
+    @Query("UPDATE coin SET favourite =:value WHERE coinId LIKE '%' || :coinId || '%'")
+    suspend fun updateCoinFavourite(coinId: String, value : Boolean)
+
+    @Query("DELETE FROM favourite WHERE coin_id LIKE '%' || :param || '%'")
+    suspend fun deleteFavouriteById(param: String)
+
+    @Insert(onConflict = REPLACE)
+    suspend fun insertFavouriteCoin(value: FavouriteCoinEntity)
+
+    @Query("DELETE FROM favourite")
+    suspend fun deleteFavourite()
+
 }

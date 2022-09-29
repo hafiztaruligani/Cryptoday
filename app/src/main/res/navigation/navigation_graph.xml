@@ -62,15 +62,7 @@
         <action
             android:id="@+id/action_info_fragment_to_detail_fragment"
             app:destination="@id/detail_fragment" />
-        <action
-            android:id="@+id/action_info_fragment_to_login"
-            app:destination="@id/login" />
     </fragment>
-    <fragment
-        android:id="@+id/login"
-        android:name="com.hafiztaruligani.cryptoday.presentation.login.Login"
-        android:label="fragment_login"
-        tools:layout="@layout/fragment_login" />
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.hafiztaruligani.cryptoday.presentation.currencies.settings.SettingsFragment"

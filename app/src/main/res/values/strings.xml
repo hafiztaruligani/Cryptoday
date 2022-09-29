@@ -26,4 +26,5 @@
     <string name="sort_by">Sort By</string>
     <string name="pair_currency">Pair Currency</string>
     <string name="apply">Apply</string>
+    <string name="login_successfully">Login Successfully</string>
 </resources>

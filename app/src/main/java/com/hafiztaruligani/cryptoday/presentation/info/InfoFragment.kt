@@ -28,6 +28,7 @@ import com.hafiztaruligani.cryptoday.databinding.FragmentInfoBinding
 import com.hafiztaruligani.cryptoday.presentation.adapters.CoinsAdapter
 import com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesFragmentDirections
 import com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesViewModel
+import com.hafiztaruligani.cryptoday.presentation.main.MainActivity
 import com.hafiztaruligani.cryptoday.util.CoinDiffUtil
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import kotlinx.coroutines.flow.collect
@@ -70,7 +71,7 @@ class InfoFragment : Fragment() {
         view.doOnPreDraw { startPostponedEnterTransition() }
 
         binding.btnLogin.setOnClickListener {
-            findNavController().navigate(InfoFragmentDirections.actionInfoFragmentToLogin())
+            (activity as MainActivity).login()// findNavController().navigate(InfoFragmentDirections.actionInfoFragmentToLogin())
         }
     }
 
@@ -85,23 +86,5 @@ class InfoFragment : Fragment() {
     lateinit var layoutManager:LinearLayoutManager
 
     private val coinDiffUtil = CoinDiffUtil()
-    private fun setupRc() {
-        layoutManager = LinearLayoutManager(context)
-        adapter = CoinsAdapter(coinDiffUtil)/*
-        coinsRc = binding.coinsRc*/
-        coinsRc.adapter = adapter
-        coinsRc.layoutManager = layoutManager
-
-        adapter.onClickListener = { coinData, viewItem->
-            val extras = FragmentNavigatorExtras(viewItem to coinData.id)
-            val action = InfoFragmentDirections.actionInfoFragmentToDetailFragment(coinData)
-            findNavController().navigate(
-                directions = action,
-                navigatorExtras = extras
-            )
-        }
-    }
-
-
 
 }

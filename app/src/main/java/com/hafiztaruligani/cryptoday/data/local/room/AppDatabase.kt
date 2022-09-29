@@ -8,12 +8,14 @@ import androidx.room.TypeConverters
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinDetailEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinRemoteKey
+import com.hafiztaruligani.cryptoday.data.local.room.entity.FavouriteCoinEntity
 
 @Database(
     entities = [
         CoinEntity::class,
         CoinDetailEntity::class,
-        CoinRemoteKey::class
+        CoinRemoteKey::class,
+        FavouriteCoinEntity::class
     ],
     version = 1,
 )

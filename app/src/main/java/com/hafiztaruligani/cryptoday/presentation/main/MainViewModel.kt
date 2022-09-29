@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.usecase.GetCoinsPagedUseCase
 import com.hafiztaruligani.cryptoday.domain.usecase.InitGlobalDataUseCase
+import com.hafiztaruligani.cryptoday.domain.usecase.user.UserUseCase
 import com.hafiztaruligani.cryptoday.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val getCoinsUseCase: GetCoinsPagedUseCase,
-    private val initGlobalDataUseCase: InitGlobalDataUseCase
+    private val initGlobalDataUseCase: InitGlobalDataUseCase,
+    private val userUseCase: UserUseCase
 ): ViewModel() {
     init {
         initGlobalData()
@@ -43,9 +45,8 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-
-    override fun onCleared() {
-        Log.d("TAG", "onCleared main")
-        super.onCleared()
+    fun getUserName() = userUseCase.getUserName.invoke()
+    fun setUserName(value: String) = viewModelScope.launch {
+        userUseCase.setUserName.invoke(value)
     }
 }

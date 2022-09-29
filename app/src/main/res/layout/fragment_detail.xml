@@ -51,7 +51,7 @@
                 style="@style/font_big"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rp. 100.000.000.000"
+                android:text="Rp. 100.000.000"
                 app:layout_constraintBottom_toBottomOf="@+id/logo"
                 app:layout_constraintStart_toStartOf="@+id/name" />
 
@@ -64,15 +64,24 @@
                 app:layout_constraintBottom_toTopOf="@+id/current_price"
                 app:layout_constraintStart_toStartOf="@+id/current_price" />
 
+            <ImageView
+                android:id="@+id/icon_arrow"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@color/transparent"
+                app:layout_constraintBottom_toBottomOf="@+id/current_price"
+                app:layout_constraintStart_toEndOf="@+id/current_price"
+                app:layout_constraintTop_toTopOf="@+id/current_price"
+                android:layout_marginStart="8dp"/>
+
             <TextView
                 android:id="@+id/price_change_percentage"
                 style="@style/font_big"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:text="100%"
                 app:layout_constraintBottom_toBottomOf="@+id/current_price"
-                app:layout_constraintStart_toEndOf="@+id/current_price" />
+                app:layout_constraintStart_toEndOf="@+id/icon_arrow" />
 
             <ImageView
                 android:id="@+id/btn_favourite"
@@ -81,7 +90,9 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_favourite_off" />
+                app:srcCompat="@color/transparent"
+                android:clickable="true"
+                android:focusable="true"/>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
