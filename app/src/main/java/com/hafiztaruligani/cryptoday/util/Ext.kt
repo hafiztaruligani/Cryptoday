@@ -28,6 +28,7 @@ fun TextView.removeLinksUnderline(context: Context) {
 }
 
 fun List<Any>.removeBracket(): String{
+    if (isEmpty()) return ""
     return toString().drop(1).dropLast(1)
 }
 fun String.convertIntoList(): List<String>{

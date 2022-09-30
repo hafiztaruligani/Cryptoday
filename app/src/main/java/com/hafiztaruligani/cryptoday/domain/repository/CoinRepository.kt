@@ -44,5 +44,6 @@ interface CoinRepository {
 
     fun getFavourite(coinsOrder: CoinsOrder): Flow<List<FavouriteCoinEntity>>
      suspend fun addFavourite(coin: Coin)
-     suspend fun deleteFavourite(coinId: String)
+     suspend fun deleteFavouriteById(coinId: String)
+     fun deleteFavourites()
 }

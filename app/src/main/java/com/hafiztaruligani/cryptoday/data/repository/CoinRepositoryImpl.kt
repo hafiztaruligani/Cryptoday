@@ -28,6 +28,7 @@ import com.hafiztaruligani.cryptoday.util.removeBracket
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import java.io.IOException
@@ -78,15 +79,16 @@ class CoinRepositoryImpl(
 
 
     override fun getCoinsPaged(coinsOrder: CoinsOrder): PagingSource<Int, CoinEntity> {
-        Log.d("TAG", "getCoinsPaged: $coinsOrder")
         if (coinsOrder.ids.isEmpty() || coinsOrder.ids.first().isBlank())
             return coinDao.getAllCoins()
         return coinDao.getAllCoinsWithParams(coinsOrder.params)
     }
 
     override suspend fun getCoin(coinId: String, currencyPair: String): Flow<CoinEntity> {
-        val data = getCoinsFromNetwork(1,1,currencyPair,SortBy.MARKET_CAP_DESC().apiString, listOf(coinId))
-        coinDao.insertCoins(data.map { it.toCoinEntity(currencyPair = currencyPair) })
+        val data = getCoinsFromNetwork(1,1,currencyPair,SortBy.MARKEY_CAP_ASC().apiString, listOf(coinId))
+        data.map { it.toCoinEntity(currencyPair = currencyPair) }.forEach {
+            coinDao.updateCoin(it.coinId, it.marketData)
+        }
         return coinDao.getCoinById(coinId)
     }
 
@@ -134,9 +136,18 @@ class CoinRepositoryImpl(
         )
     }
 
-    override suspend fun deleteFavourite(coinId: String) {
+    override suspend fun deleteFavouriteById(coinId: String) {
         coinDao.updateCoinFavourite(coinId, false)
         coinDao.deleteFavouriteById(coinId)
+    }
+
+    override fun deleteFavourites(){
+        CoroutineScope(Dispatchers.IO).launch {
+            coinDao.getAllFavourite().first().forEach {
+                coinDao.updateCoinFavourite(it.coinId, false)
+            }
+            coinDao.deleteFavourite()
+        }
     }
 
     private suspend fun uploadFavouriteCoins(coins: List<FavouriteCoinEntity>){

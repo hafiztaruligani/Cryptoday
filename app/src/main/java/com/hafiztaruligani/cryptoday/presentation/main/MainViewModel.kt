@@ -49,4 +49,8 @@ class MainViewModel @Inject constructor(
     fun setUserName(value: String) = viewModelScope.launch {
         userUseCase.setUserName.invoke(value)
     }
+
+    fun logout() {
+        userUseCase.logout.invoke()
+    }
 }

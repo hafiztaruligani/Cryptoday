@@ -8,6 +8,6 @@ import javax.inject.Inject
 
 class DeleteFavourite  @Inject constructor(private val coinRepository: CoinRepository) {
     operator fun invoke(coinId: String) = CoroutineScope(Dispatchers.IO).launch {
-        coinRepository.deleteFavourite(coinId)
+        coinRepository.deleteFavouriteById(coinId)
     }
 }

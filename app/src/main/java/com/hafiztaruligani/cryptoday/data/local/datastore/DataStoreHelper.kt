@@ -35,16 +35,6 @@ class DataStoreHelper(private val context: Context) {
         } as Flow<T>
     }
 
-    fun <T> readOnce(key: String, clazz: Class<T>): T {
-        return context.dataStore.data.map {
-            when (clazz){
-                Boolean::class.java -> it[booleanPreferencesKey(key)]?:false
-                String::class.java -> it[stringPreferencesKey(key)]?:""
-                else -> null
-            }
-        } as T
-    }
-
     suspend fun clear(){
         context.dataStore.edit {
             it.clear()

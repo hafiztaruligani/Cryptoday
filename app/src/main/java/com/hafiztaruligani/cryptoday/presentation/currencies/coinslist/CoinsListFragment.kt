@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.paging.map
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hafiztaruligani.cryptoday.R
@@ -166,6 +167,9 @@ coinsRc.addOnScrollListener(object : RecyclerView.OnScrollListener(){
 
             launch {
                 viewModel.coins.collectLatest {
+                    var a = ""
+                    it.map { c-> a =c.id }
+                    Log.d(TAG, "bug observeAllCoins: ${a}")
                     pagingAdapter.submitData(it)
                 }
             }

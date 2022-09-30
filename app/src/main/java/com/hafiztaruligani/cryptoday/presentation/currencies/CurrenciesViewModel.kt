@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.map
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.usecase.*
 import com.hafiztaruligani.cryptoday.domain.usecase.favourite.FavouriteUseCase
@@ -45,13 +46,13 @@ class CurrenciesViewModel @Inject constructor(
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = CoinsOrder())
 
     var coins : Flow<PagingData<Coin>> = coinsOrder.flatMapLatest {
-        try{
+       // try{
             getCoins(it)
-        }finally {
+        /*}finally {
             _loading.value = false
             _needToScroll.value = true
-        }
-    }
+        }*/
+    }.cachedIn(viewModelScope)
 
     private val _needToScroll = MutableStateFlow(false)
     val needToScroll: StateFlow<Boolean> = _needToScroll

@@ -7,6 +7,7 @@ import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinDetailEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinWithDetailEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.FavouriteCoinEntity
+import com.hafiztaruligani.cryptoday.domain.model.MarketData
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -28,6 +29,8 @@ interface CoinDao {
     @Query("SELECT * FROM coin WHERE coinId=:coinId")
     fun getCoinById(coinId: String): Flow<CoinEntity>
 
+    @Query("UPDATE coin SET market_data=:marketData WHERE coinId=:coinId")
+    suspend fun updateCoin(coinId: String, marketData: MarketData)
 
     @Insert(onConflict = REPLACE)
     suspend fun insertCoins(coinEntity: List<CoinEntity>)

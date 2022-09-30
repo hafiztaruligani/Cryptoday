@@ -6,5 +6,6 @@ data class UserUseCase @Inject constructor(
     val getUserCurrencyPair: GetUserCurrencyPair,
     val getUserName: GetUserName,
     val setUserName: SetUserName,
-    val setUserCurrencyPair: SetUserCurrencyPair
-)
+    val setUserCurrencyPair: SetUserCurrencyPair,
+    val logout: Logout
+    )

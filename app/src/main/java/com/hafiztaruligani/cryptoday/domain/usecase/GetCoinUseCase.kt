@@ -13,7 +13,6 @@ class GetCoinUseCase @Inject constructor(private val coinRepository: CoinReposit
     suspend operator fun invoke(coinId: String): Flow<Resource<Coin>> = flow{
         try {
             emit(Resource.Loading())
-            val currencyPair = userRepository.getUserName().firstOrNull()?:"usd".ifEmpty { "usd" }
             coinRepository.getCoin(coinId, "usd").collect() {
                emit( Resource.Success(it.toCoin()))
             }

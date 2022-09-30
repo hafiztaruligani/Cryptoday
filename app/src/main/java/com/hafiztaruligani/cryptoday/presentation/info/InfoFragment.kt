@@ -31,9 +31,12 @@ import com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesViewModel
 import com.hafiztaruligani.cryptoday.presentation.main.MainActivity
 import com.hafiztaruligani.cryptoday.util.CoinDiffUtil
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class InfoFragment : Fragment() {
 
     companion object {
@@ -52,12 +55,26 @@ class InfoFragment : Fragment() {
     ): View {
         binding = FragmentInfoBinding.inflate(layoutInflater)
 
-        //setupRc()
         viewLifecycleOwner.lifecycleScope.launch(){
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.a.collect() {
+                launch {
+                    viewModel.description.collectLatest {
+                        binding.description.text = it
+                    }
+                }
 
-                    //Log.d(TAG, "collecting : $it")
+                viewModel.userName.collectLatest {
+                    binding.apply {
+                        if (it.isBlank()) {
+                            userName.text = resources.getText(R.string.login)
+                            btnLoginLogout.text = resources.getText(R.string.login)
+                            btnLoginLogout.setOnClickListener { (activity as MainActivity).login() }
+                        }else{
+                            userName.text = it
+                            btnLoginLogout.text = resources.getText(R.string.logout)
+                            btnLoginLogout.setOnClickListener { (activity as MainActivity).logout() }
+                        }
+                    }
                 }
             }
         }
@@ -67,12 +84,6 @@ class InfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postponeEnterTransition()
-        view.doOnPreDraw { startPostponedEnterTransition() }
-
-        binding.btnLogin.setOnClickListener {
-            (activity as MainActivity).login()// findNavController().navigate(InfoFragmentDirections.actionInfoFragmentToLogin())
-        }
     }
 
     override fun onResume() {

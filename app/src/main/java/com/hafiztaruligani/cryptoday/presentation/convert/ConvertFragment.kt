@@ -47,13 +47,7 @@ class ConvertFragment : Fragment() {
             viewmodel = viewModel
         }
         setupAutoComplete()
-        initData()
         return binding.root
-    }
-
-    private fun initData() {/*
-        viewModel.postCoinId1("bitcoin")
-        viewModel.postCoinId2("ethereum")*/
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

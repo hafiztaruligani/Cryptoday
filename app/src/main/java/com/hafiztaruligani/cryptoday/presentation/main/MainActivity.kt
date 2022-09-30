@@ -17,6 +17,8 @@ import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.auth.api.identity.SignInCredential
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -166,6 +168,10 @@ class MainActivity : AppCompatActivity() {
         }.addOnFailureListener {
             Toast.makeText(this, getString(R.string.google_account_not_found), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    fun logout() {
+        viewModel.logout()
     }
 
 }

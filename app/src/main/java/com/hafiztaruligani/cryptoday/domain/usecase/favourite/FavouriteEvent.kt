@@ -10,6 +10,6 @@ import javax.inject.Inject
 class FavouriteEvent @Inject constructor(private val coinRepository: CoinRepository) {
     operator fun invoke(coin: Coin) = CoroutineScope(Dispatchers.IO).launch {
         if(coin.favourite) coinRepository.addFavourite(coin)
-        else coinRepository.deleteFavourite(coin.id)
+        else coinRepository.deleteFavouriteById(coin.id)
     }
 }

@@ -13,12 +13,6 @@ class CoinDiffUtil() :DiffUtil.ItemCallback<Coin>()  {
     override fun areContentsTheSame(oldItem: Coin, newItem: Coin): Boolean {
         oldItem.marketData.lastUpdate = ""
         newItem.marketData.lastUpdate = ""
-        if (oldItem.marketData != newItem.marketData) {
-            Log.d(
-                "TAG",
-                "areContentsTheSame ${newItem.id}: \n old: ${oldItem.marketData} \n new: ${newItem.marketData}"
-            )
-        }
 
         return oldItem.marketData == newItem.marketData
     }

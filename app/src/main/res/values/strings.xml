@@ -27,4 +27,9 @@
     <string name="pair_currency">Pair Currency</string>
     <string name="apply">Apply</string>
     <string name="login_successfully">Login Successfully</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="content_description">content_description</string>
+    <string name="welcome">Welcome</string>
+    <string name="cryptoday">Cryptoday</string>
 </resources>

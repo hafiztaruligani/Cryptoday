@@ -8,4 +8,5 @@ interface UserRepository {
 
     suspend fun setUserCurrencyPair(value: String)
     fun getUserCurrencyPair(): Flow<String>
+    fun logout()
 }
