@@ -9,7 +9,7 @@
         <import type="android.view.View"/>
         <variable
             name="viewmodel"
-            type="com.hafiztaruligani.cryptoday.presentation.convert.ConverViewModel" />
+            type="com.hafiztaruligani.cryptoday.presentation.convert.ConvertViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -14,7 +14,6 @@ import androidx.lifecycle.lifecycleScope
 import com.hafiztaruligani.cryptoday.R
 import com.hafiztaruligani.cryptoday.databinding.FragmentConvertBinding
 import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
-import com.hafiztaruligani.cryptoday.domain.model.MarketData
 import com.hafiztaruligani.cryptoday.presentation.adapters.AutoCompleteAdapter
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import com.hafiztaruligani.cryptoday.util.glide
@@ -30,7 +29,7 @@ class ConvertFragment : Fragment() {
         }
     }
 
-    private val viewModel by viewModels<ConverViewModel>()
+    private val viewModel by viewModels<ConvertViewModel>()
     private lateinit var binding: FragmentConvertBinding
 
     private var coin1Focus = false

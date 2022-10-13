@@ -1,4 +1,4 @@
-package com.hafiztaruligani.cryptoday.domain.usecase
+package com.hafiztaruligani.cryptoday.domain.usecase.coin
 
 import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
 import kotlinx.coroutines.flow.Flow

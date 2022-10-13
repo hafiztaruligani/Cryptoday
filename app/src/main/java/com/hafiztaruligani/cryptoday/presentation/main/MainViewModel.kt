@@ -3,8 +3,8 @@ package com.hafiztaruligani.cryptoday.presentation.main
 import android.util.Log
 import androidx.lifecycle.*
 import com.hafiztaruligani.cryptoday.domain.model.Coin
-import com.hafiztaruligani.cryptoday.domain.usecase.GetCoinsPagedUseCase
 import com.hafiztaruligani.cryptoday.domain.usecase.InitGlobalDataUseCase
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.GetCoinsPagedUseCase
 import com.hafiztaruligani.cryptoday.domain.usecase.user.UserUseCase
 import com.hafiztaruligani.cryptoday.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

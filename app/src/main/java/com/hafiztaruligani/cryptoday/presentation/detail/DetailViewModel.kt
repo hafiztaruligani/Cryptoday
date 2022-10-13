@@ -6,8 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hafiztaruligani.cryptoday.domain.model.Coin
-import com.hafiztaruligani.cryptoday.domain.model.CoinWithDetail
-import com.hafiztaruligani.cryptoday.domain.usecase.GetCoinWithDetailUseCase
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.GetCoinWithDetailUseCase
 import com.hafiztaruligani.cryptoday.domain.usecase.favourite.FavouriteUseCase
 import com.hafiztaruligani.cryptoday.domain.usecase.user.GetUserName
 import com.hafiztaruligani.cryptoday.domain.usecase.user.UserUseCase

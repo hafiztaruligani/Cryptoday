@@ -18,4 +18,8 @@
     <color name="blur_background">#400D1E4D</color>
     <color name="up">#06DF23</color>
     <color name="down">#DF1C1C</color>
+
+    <color name="icon_unselect">#DF1C1C</color>
+    <color name="icon_select">#1CDF36</color>
+
 </resources>

@@ -66,7 +66,7 @@ class InfoFragment : Fragment() {
                 viewModel.userName.collectLatest {
                     binding.apply {
                         if (it.isBlank()) {
-                            userName.text = resources.getText(R.string.login)
+                            userName.text = resources.getText(R.string.cryptoday)
                             btnLoginLogout.text = resources.getText(R.string.login)
                             btnLoginLogout.setOnClickListener { (activity as MainActivity).login() }
                         }else{

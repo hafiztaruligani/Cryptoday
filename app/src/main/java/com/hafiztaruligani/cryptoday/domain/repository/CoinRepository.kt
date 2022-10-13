@@ -8,7 +8,7 @@ import com.hafiztaruligani.cryptoday.data.local.room.entity.FavouriteCoinEntity
 import com.hafiztaruligani.cryptoday.data.remote.dto.CoinResponse
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
-import com.hafiztaruligani.cryptoday.domain.usecase.CoinsOrder
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.CoinsOrder
 import kotlinx.coroutines.flow.Flow
 
 interface CoinRepository {

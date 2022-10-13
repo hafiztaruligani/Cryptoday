@@ -9,7 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.hafiztaruligani.cryptoday.R
 import com.hafiztaruligani.cryptoday.databinding.FragmentSettingsBinding
-import com.hafiztaruligani.cryptoday.domain.usecase.SortBy
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.SortBy
 import com.hafiztaruligani.cryptoday.presentation.adapters.PairAdapter
 import com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesViewModel
 import dagger.hilt.android.AndroidEntryPoint

@@ -4,10 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hafiztaruligani.cryptoday.domain.model.Coin
-import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
-import com.hafiztaruligani.cryptoday.domain.usecase.GetCoinUseCase
-import com.hafiztaruligani.cryptoday.domain.usecase.SearchCoinIdUseCase
-import com.hafiztaruligani.cryptoday.util.Cons.TAG
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.GetCoinUseCase
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.SearchCoinIdUseCase
 import com.hafiztaruligani.cryptoday.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -17,7 +15,7 @@ import kotlin.math.log
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
-class ConverViewModel @Inject constructor(
+class ConvertViewModel @Inject constructor(
     private val searchCoinIdUseCase: SearchCoinIdUseCase,
     private val getCoinUseCase: GetCoinUseCase
 ) : ViewModel() {

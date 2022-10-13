@@ -1,18 +1,13 @@
 package com.hafiztaruligani.cryptoday.domain.usecase.favourite
 
-import androidx.paging.*
 import com.hafiztaruligani.cryptoday.data.local.room.AppDatabase
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
-import com.hafiztaruligani.cryptoday.domain.repository.paging.CoinPagingRemoteMediator
-import com.hafiztaruligani.cryptoday.domain.usecase.CoinsOrder
-import com.hafiztaruligani.cryptoday.domain.usecase.SortBy
-import com.hafiztaruligani.cryptoday.util.Cons
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.CoinsOrder
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.SortBy
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
-@OptIn(ExperimentalPagingApi::class, ExperimentalCoroutinesApi::class)
 class GetFavouriteCoins @Inject constructor(
     private val coinRepository: CoinRepository,
     private val appDatabase: AppDatabase

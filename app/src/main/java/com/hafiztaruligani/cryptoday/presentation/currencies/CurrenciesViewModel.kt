@@ -7,6 +7,7 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.usecase.*
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.*
 import com.hafiztaruligani.cryptoday.domain.usecase.favourite.FavouriteUseCase
 import com.hafiztaruligani.cryptoday.domain.usecase.user.UserUseCase
 import com.hafiztaruligani.cryptoday.presentation.currencies.settings.SettingUiState

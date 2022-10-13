@@ -17,9 +17,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class UserRepositoryImpl (
-    private val dataStoreHelper: DataStoreHelper,
-    private val coinRepository: CoinRepository
-    ): UserRepository {
+    private val dataStoreHelper: DataStoreHelper
+): UserRepository {
 
     companion object{
         private const val USER_NAME_KEY = "user_name_key"
@@ -28,11 +27,8 @@ class UserRepositoryImpl (
 
     override fun logout(){
         CoroutineScope(Dispatchers.Unconfined).launch {
-            launch {
-                Firebase.auth.signOut()
-                dataStoreHelper.clear()
-            }
-            coinRepository.deleteFavourites()
+            Firebase.auth.signOut()
+            dataStoreHelper.clear()
         }
     }
 

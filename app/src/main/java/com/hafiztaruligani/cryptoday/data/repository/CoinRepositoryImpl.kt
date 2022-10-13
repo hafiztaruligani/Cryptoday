@@ -19,8 +19,8 @@ import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
 import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
 import com.hafiztaruligani.cryptoday.domain.repository.UserRepository
-import com.hafiztaruligani.cryptoday.domain.usecase.CoinsOrder
-import com.hafiztaruligani.cryptoday.domain.usecase.SortBy
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.CoinsOrder
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.SortBy
 import com.hafiztaruligani.cryptoday.util.Cons
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import com.hafiztaruligani.cryptoday.util.convertIntoList

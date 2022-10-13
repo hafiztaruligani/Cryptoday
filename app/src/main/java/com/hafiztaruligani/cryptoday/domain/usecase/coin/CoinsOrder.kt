@@ -1,4 +1,4 @@
-package com.hafiztaruligani.cryptoday.domain.usecase
+package com.hafiztaruligani.cryptoday.domain.usecase.coin
 
 import java.io.IOException
 

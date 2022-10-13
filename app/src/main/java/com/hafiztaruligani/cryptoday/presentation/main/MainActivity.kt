@@ -166,6 +166,7 @@ class MainActivity : AppCompatActivity() {
         oneTapClient.beginSignIn(signInRequest).addOnSuccessListener {
             googleLoginRequest.launch(IntentSenderRequest.Builder(it.pendingIntent.intentSender).build())
         }.addOnFailureListener {
+            Log.d(TAG, "login: ${it}")
             Toast.makeText(this, getString(R.string.google_account_not_found), Toast.LENGTH_SHORT).show()
         }
     }

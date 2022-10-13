@@ -9,7 +9,7 @@ import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinRemoteKey
 import com.hafiztaruligani.cryptoday.data.remote.dto.CoinResponse
 import com.hafiztaruligani.cryptoday.domain.repository.CoinRepository
-import com.hafiztaruligani.cryptoday.domain.usecase.CoinsOrder
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.CoinsOrder
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import retrofit2.HttpException
 import java.io.IOException

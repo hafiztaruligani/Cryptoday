@@ -3,11 +3,16 @@
     <item
         android:id="@+id/currencies_fragment"
         android:title="@string/currencies"
+        android:icon="@drawable/ic_baseline_attach_money_24"
         />
     <item
         android:id="@+id/convert_fragment"
-        android:title="@string/convert"/>
+        android:title="@string/convert"
+        android:icon="@drawable/ic_baseline_currency_exchange_24"
+        />
     <item
         android:id="@+id/info_fragment"
-        android:title="@string/info"/>
+        android:title="@string/info"
+        android:icon="@drawable/ic_baseline_info_24"
+        />
 </menu>
