@@ -33,4 +33,5 @@
     <string name="welcome">Welcome</string>
     <string name="cryptoday">Cryptoday</string>
     <string name="default_content_description">default_content_description</string>
+    <string name="coin_not_found">Coin Not Found</string>
 </resources>

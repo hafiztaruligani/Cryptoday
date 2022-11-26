@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -17,6 +16,7 @@ import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
 import com.hafiztaruligani.cryptoday.presentation.adapters.AutoCompleteAdapter
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
 import com.hafiztaruligani.cryptoday.util.glide
+import com.hafiztaruligani.cryptoday.util.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 
@@ -45,6 +45,7 @@ class ConvertFragment : Fragment() {
     ): View {
         binding = FragmentConvertBinding.inflate(layoutInflater).apply {
             viewmodel = viewModel
+            lifecycleOwner = this@ConvertFragment.viewLifecycleOwner
         }
         setupAutoComplete()
         return binding.root
@@ -55,56 +56,62 @@ class ConvertFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launchWhenResumed {
             viewModel.uiState.collectLatest { uiState ->
-                uiState.apply {
-
-                    Log.d(TAG, "uistate: $loading1 ${coins1SearchResult?.size ?: "null"}")
-
-                    if ((!loading1 && coins1SearchResult?.size == 0) || (!loading2 && coins2SearchResult?.size == 0)) {
-                        Toast.makeText(requireContext(), "Coin Not Found", Toast.LENGTH_LONG).show()
-                    }
-
-                    if (error.isNotBlank())
-                        Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
-
-                    coin1?.image?.let { binding.logo1.glide(requireContext(), it) }
-                    coin2?.image?.let { binding.logo2.glide(requireContext(), it) }
-
-                    binding.loading1.isVisible = loading1
-                    binding.loading2.isVisible = loading2
-
-                    (!loading1).let {
-                        binding.logo1.isVisible = it
-                        binding.coin1Amount.isEnabled = it
-                        coin1?.name?.let { t ->
-                            binding.coin1AutoComplete.setAdapter(null)
-                            binding.coin1AutoComplete.setText(t)
-                            binding.coin1AutoComplete.setAdapter(adapter1)
-                        }
-                    }
-                    (!loading2).let {
-                        binding.logo2.isVisible = it
-                        binding.coin2Amount.isEnabled = it
-                        coin2?.name?.let { t ->
-                            binding.coin2AutoComplete.setAdapter(null)
-                            binding.coin2AutoComplete.setText(t)
-                            binding.coin2AutoComplete.setAdapter(adapter2)
-                        }
-                    }
-
-                    coins1SearchResult?.let { adapter1.setData(it) } ?: adapter1.notifyDataSetInvalidated()
-                    coins2SearchResult?.let { adapter2.setData(it) } ?: adapter2.notifyDataSetInvalidated()
-
-                    result?.let { result ->
-                        if (!coin1Focus) binding.coin1Amount.setText(result.first)
-                        if (!coin2Focus) binding.coin2Amount.setText(result.second)
-                    }
-                }
+                setErrorHandler(uiState)
+                setImage(uiState)
+                setLoading(uiState)
+                setAdapter(uiState)
+                setResult(uiState)
             }
         }
     }
 
-    private fun setupAutoComplete() {
-        binding.apply {
+    private fun setResult(state: ConvertUiState) = state.apply {
+        result?.let { result ->
+            if (!coin2Focus) binding.coin2Amount.setText(result.second)
+            if (!coin1Focus) binding.coin1Amount.setText(result.first)
+        }
+    }
+
+    private fun setAdapter(state: ConvertUiState) = state.apply {
+        coins1SearchResult?.let { adapter1.setData(it) } ?: adapter1.notifyDataSetInvalidated()
+        coins2SearchResult?.let { adapter2.setData(it) } ?: adapter2.notifyDataSetInvalidated()
+    }
+
+    private fun setLoading(state: ConvertUiState) = state.apply {
+        binding.loading1.isVisible = loading1
+        binding.loading2.isVisible = loading2
+
+        (!loading1).let {
+            binding.logo1.isVisible = it
+            binding.coin1Amount.isEnabled = it
+            coin1?.name?.let { t ->
+                binding.coin1AutoComplete.setAdapter(null)
+                binding.coin1AutoComplete.setText(t)
+                binding.coin1AutoComplete.setAdapter(adapter1)
+            }
+        }
+        (!loading2).let {
+            binding.logo2.isVisible = it
+            binding.coin2Amount.isEnabled = it
+            coin2?.name?.let { t ->
+                binding.coin2AutoComplete.setAdapter(null)
+                binding.coin2AutoComplete.setText(t)
+                binding.coin2AutoComplete.setAdapter(adapter2)
+            }
+        }
+    }
+
+    private fun setImage(state: ConvertUiState) = state.apply {
+        coin1?.image?.let { binding.logo1.glide(requireContext(), it) }
+        coin2?.image?.let { binding.logo2.glide(requireContext(), it) }
+    }
+
+    private fun setErrorHandler(state: ConvertUiState) = state.apply {
+        if (error.isNotBlank()) toast(error)
+        if (coinNotFound()) toast(getString(R.string.coin_not_found))
+    }
+
+    private fun setupAutoComplete() = binding.apply {
 
             adapter1 = AutoCompleteAdapter(requireContext(), R.layout.item_autocomplete_coin)
             coin1AutoComplete.setAdapter(adapter1)
@@ -140,5 +147,5 @@ class ConvertFragment : Fragment() {
                 coin2Focus = b
             }
         }
-    }
+
 }

@@ -62,6 +62,14 @@ class ConvertViewModel @Inject constructor(
     private val _coin1Id = MutableStateFlow("bitcoin")
     private val _coin2Id = MutableStateFlow("ethereum")
 
+    fun postCoinId1(coinId: String) {
+        if (_coin1Id.value != coinId) _coin1Id.value = coinId
+    }
+
+    fun postCoinId2(coinId: String) {
+        if (_coin2Id.value != coinId) _coin2Id.value = coinId
+    }
+
     private val coin1: StateFlow<Coin?> = _coin1Id.flatMapLatest {
         getCoinUseCase.invoke(it).filter { resource ->
             when (resource) {
@@ -108,22 +116,14 @@ class ConvertViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    fun postCoinId1(coinId: String) {
-        if (_coin1Id.value != coinId) _coin1Id.value = coinId
-    }
-
-    fun postCoinId2(coinId: String) {
-        if (_coin2Id.value != coinId) _coin2Id.value = coinId
-    }
-
     fun postCoinAmount1(value: String) {
         viewModelScope.launch {
             combine(coin1, coin2) { a, b ->
                 Pair(a, b)
             }.collectLatest {
 
-                val price1 = it.first?.marketData?.currentPrice ?: return@collectLatest // coin1.value?.marketData?.currentPrice?:0.0
-                val price2 = it.second?.marketData?.currentPrice ?: return@collectLatest // 0.0//coin2.value?.marketData?.currentPrice?:0.0
+                val price1 = it.first?.marketData?.currentPrice ?: return@collectLatest
+                val price2 = it.second?.marketData?.currentPrice ?: return@collectLatest
 
                 val r2 = (price1 / price2) * value.toDouble()
                 _uiState.value = _uiState.value.copy(result = Pair(value, r2.toString()))
@@ -137,8 +137,8 @@ class ConvertViewModel @Inject constructor(
                 Pair(a, b)
             }.collectLatest {
 
-                val price1 = it.first?.marketData?.currentPrice ?: return@collectLatest // coin1.value?.marketData?.currentPrice?:0.0
-                val price2 = it.second?.marketData?.currentPrice ?: return@collectLatest // 0.0//coin2.value?.marketData?.currentPrice?:0.0
+                val price1 = it.first?.marketData?.currentPrice ?: return@collectLatest
+                val price2 = it.second?.marketData?.currentPrice ?: return@collectLatest
 
                 val r1 = (price2 / price1) * value.toDouble()
                 _uiState.value = _uiState.value.copy(result = Pair(r1.toString(), value))
@@ -156,7 +156,4 @@ class ConvertViewModel @Inject constructor(
         coin2Param.value = tmp
     }
 
-    var job: Job? = null
-    fun a() {
-    }
 }

@@ -6,7 +6,9 @@ import android.text.TextPaint
 import android.text.style.URLSpan
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.hafiztaruligani.cryptoday.R
@@ -44,6 +46,15 @@ fun ImageView.glide(context: Context, resource: Any) {
         .override(width, height)
         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
         .into(this)
+}
+
+fun Fragment.toast(msg: String, isShowLong: Boolean = true) {
+    Toast.makeText(
+        requireContext(),
+        msg,
+        if (isShowLong) Toast.LENGTH_LONG
+        else Toast.LENGTH_SHORT
+    ).show()
 }
 
 // fun Any?.toInt(): Int = this.toString().toInt()

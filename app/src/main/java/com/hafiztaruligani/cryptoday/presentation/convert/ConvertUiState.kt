@@ -12,4 +12,7 @@ data class ConvertUiState(
     val coins2SearchResult: List<CoinSimple>? = null,
     val result: Pair<String, String>? = null,
     val error: String = ""
-)
+) {
+    fun coinNotFound() = (!loading1 && coins1SearchResult?.size == 0) ||
+        (!loading2 && coins2SearchResult?.size == 0)
+}
