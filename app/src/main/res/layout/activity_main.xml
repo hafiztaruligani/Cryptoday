@@ -6,11 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".presentation.main.MainActivity">
 
-    <!--<FrameLayout
-        android:id="@+id/main_frame_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_nav" />-->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager_frame"
         android:layout_width="match_parent"
@@ -29,7 +24,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/view_pager_frame"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/navigation_graph" />
+        app:navGraph="@navigation/navigation_graph"
+        />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"

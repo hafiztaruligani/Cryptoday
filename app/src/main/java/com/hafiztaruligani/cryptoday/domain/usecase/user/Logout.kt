@@ -8,7 +8,7 @@ class Logout @Inject constructor(
     private val userRepository: UserRepository,
     private val coinsRepository: CoinRepository
 ) {
-    operator fun invoke(){
+    operator fun invoke() {
         userRepository.logout()
         coinsRepository.deleteFavourites()
     }

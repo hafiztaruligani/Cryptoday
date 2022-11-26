@@ -4,6 +4,6 @@ import com.google.gson.annotations.SerializedName
 
 data class SearchResponse(
 
-	@field:SerializedName("coins")
-	val coins: List<CoinsItem?>? = null
+    @field:SerializedName("coins")
+    val coins: List<CoinsItem?>? = null
 )

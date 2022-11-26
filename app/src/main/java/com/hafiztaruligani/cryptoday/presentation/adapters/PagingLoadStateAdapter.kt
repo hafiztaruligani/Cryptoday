@@ -17,13 +17,15 @@ import retrofit2.HttpException
 
 class PagingLoadStateAdapter(
     private val lifecycleCoroutineScope: LifecycleCoroutineScope,
-    private val retry: ()->Unit
-): LoadStateAdapter<PagingLoadStateAdapter.ViewHolder>() {
+    private val retry: () -> Unit
+) : LoadStateAdapter<PagingLoadStateAdapter.ViewHolder>() {
 
     companion object {
         const val NETWORK_SERVER_LIMITED = 429
     }
-    inner class ViewHolder (val binding: ItemLoadStateBinding): RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(
+        val binding: ItemLoadStateBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
         init {
             binding.btn.setOnClickListener {
                 retry.invoke()
@@ -32,26 +34,33 @@ class PagingLoadStateAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, loadState: LoadState): ViewHolder {
-        return ViewHolder(ItemLoadStateBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        return ViewHolder(
+            ItemLoadStateBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, loadState: LoadState) {
         val isLoading = loadState is LoadState.Loading
         holder.binding.apply {
+            Log.d(TAG, "onBindViewHolder: ${loadState.endOfPaginationReached}")
             loading.isVisible = isLoading
             message.isVisible = !isLoading
             btn.isVisible = !isLoading
 
-            if(loadState is LoadState.Error)
+            if (loadState is LoadState.Error)
                 setErrorMessage(loadState.error, this)
         }
     }
 
-    private fun setErrorMessage(loadState: Throwable, binding: ItemLoadStateBinding){
+    private fun setErrorMessage(loadState: Throwable, binding: ItemLoadStateBinding) {
         Log.d(TAG, "pe bot: $loadState")
         binding.apply {
             if (loadState is HttpException) {
-                when (loadState.code()){
+                when (loadState.code()) {
                     NETWORK_SERVER_LIMITED -> {
                         Log.d(TAG, "setErrorMessage: pe server limited top")
                         lifecycleCoroutineScope.launchWhenResumed {
@@ -67,11 +76,11 @@ class PagingLoadStateAdapter(
                         }
                     }
                     else -> {
-                        message.text = root.context.getString(R.string.network_unavailable).plus(" (${loadState.code()})")
+                        message.text = root.context.getString(R.string.network_unavailable)
+                            .plus(" (${loadState.code()})")
                     }
                 }
-            }
-            else {
+            } else {
                 message.text = root.context.getString(R.string.network_unavailable)
             }
         }

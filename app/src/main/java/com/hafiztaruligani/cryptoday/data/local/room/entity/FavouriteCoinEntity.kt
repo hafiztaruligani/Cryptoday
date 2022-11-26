@@ -20,16 +20,16 @@ data class FavouriteCoinEntity(
     @ColumnInfo(name = "market_data")
     val marketData: MarketData,
     @ColumnInfo(name = "rank")
-    val rank:Int?= marketData.marketCapRank,
+    val rank: Int? = marketData.marketCapRank,
     @ColumnInfo(name = "favourite")
-    val favourite: Boolean
-){
+    val isFavorite: Boolean
+) {
     fun toCoin(): Coin = Coin(
-        id=coinId,
-        symbol=symbol,
-        name=name,
-        image=image,
-        marketData=marketData,
-        favourite = favourite
+        id = coinId,
+        symbol = symbol,
+        name = name,
+        image = image,
+        marketData = marketData,
+        isFavorite = isFavorite
     )
 }

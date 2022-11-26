@@ -5,10 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.hafiztaruligani.cryptoday.databinding.ItemPairBinding
 
-class PairAdapter(val context: Context): BaseAdapter() {
+class PairAdapter(val context: Context) : BaseAdapter() {
 
     var pairs = mutableListOf<String>()
 
@@ -23,7 +22,6 @@ class PairAdapter(val context: Context): BaseAdapter() {
     override fun getItemId(p0: Int): Long {
         return p0.toLong()
     }
-
 
     override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
         val binding = ItemPairBinding.inflate(LayoutInflater.from(context), p2, false)

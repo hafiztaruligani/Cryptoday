@@ -2,9 +2,7 @@ package com.hafiztaruligani.cryptoday.domain.model
 
 import android.os.Parcelable
 import com.hafiztaruligani.cryptoday.data.local.room.entity.FavouriteCoinEntity
-import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
-
 
 @Parcelize
 data class Coin(
@@ -13,11 +11,11 @@ data class Coin(
     val name: String,
     val image: String,
     val marketData: MarketData,
-    var favourite: Boolean = false
+    var isFavorite: Boolean = false
 ) : Parcelable {
 
     fun getTitle() =
-        if (marketData.marketCapRank==null) "$name (${symbol.uppercase()})"
+        if (marketData.marketCapRank == null) "$name (${symbol.uppercase()})"
         else "#${marketData.marketCapRank} $name (${symbol.uppercase()})"
 
     fun toFavouriteCoinEntity() =
@@ -28,6 +26,6 @@ data class Coin(
             image = image,
             marketData = marketData,
             rank = marketData.marketCapRank,
-            favourite = favourite
+            isFavorite = isFavorite
         )
 }

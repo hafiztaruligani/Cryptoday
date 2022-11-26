@@ -8,4 +8,4 @@ data class UserUseCase @Inject constructor(
     val setUserName: SetUserName,
     val setUserCurrencyPair: SetUserCurrencyPair,
     val logout: Logout
-    )
+)

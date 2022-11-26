@@ -4,48 +4,55 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinDetailEntity
-import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinEntity
+import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinPagingDataEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.CoinWithDetailEntity
 import com.hafiztaruligani.cryptoday.data.local.room.entity.FavouriteCoinEntity
+import com.hafiztaruligani.cryptoday.data.local.room.entity.QueryHistoryEntity
 import com.hafiztaruligani.cryptoday.domain.model.MarketData
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CoinDao {
 
+    // coin paging data
     @Transaction
-    @Query("SELECT * FROM coin")//" ORDER BY rank ASC")
-    fun getAllCoins(): PagingSource<Int,CoinEntity>
-
-    @Transaction
-    @Query("SELECT * FROM coin WHERE coinId LIKE '%' || :params || '%' OR symbol LIKE '%' || :params || '%'")//" ORDER BY rank ASC")
-    fun getAllCoinsWithParams(params: String): PagingSource<Int,CoinEntity>
+    @Query("SELECT * FROM coin_paging_data ")
+    fun getCoinPagingData(): PagingSource<Int, CoinPagingDataEntity>
 
     @Transaction
-    @Query("SELECT * FROM coin WHERE coinId=:coinId")
-    fun getCoinWithDetailById(coinId: String): Flow<CoinWithDetailEntity>
+    @Query(
+        "SELECT * FROM coin_paging_data " +
+            "WHERE coinId LIKE '%' || :params || '%' " +
+            "OR symbol LIKE '%' || :params || '%'"
+    )
+    fun getCoinPagingDataByQuery(params: String): PagingSource<Int, CoinPagingDataEntity>
 
+    @Query("SELECT * FROM coin_paging_data WHERE coinId=:coinId")
+    fun getCoinPagingDataById(coinId: String): Flow<CoinPagingDataEntity>
 
-    @Query("SELECT * FROM coin WHERE coinId=:coinId")
-    fun getCoinById(coinId: String): Flow<CoinEntity>
-
-    @Query("UPDATE coin SET market_data=:marketData WHERE coinId=:coinId")
-    suspend fun updateCoin(coinId: String, marketData: MarketData)
+    @Query("UPDATE coin_paging_data SET market_data=:marketData WHERE coinId=:coinId")
+    suspend fun updateCoinPagingData(coinId: String, marketData: MarketData)
 
     @Insert(onConflict = REPLACE)
-    suspend fun insertCoins(coinEntity: List<CoinEntity>)
+    suspend fun insertCoinPagingData(coinPagingDataEntity: List<CoinPagingDataEntity>)
+
+    @Query("DELETE FROM coin_paging_data")
+    suspend fun deleteCoinPagingData()
+
+    // coin detail
+    @Transaction
+    @Query("SELECT * FROM coin_paging_data WHERE coinId=:coinId")
+    fun getCoinWithDetailById(coinId: String): Flow<CoinWithDetailEntity>
 
     @Insert(onConflict = REPLACE)
     suspend fun insertCoinDetail(coinDetailEntity: CoinDetailEntity)
 
-    @Query("DELETE FROM coin")
-    suspend fun delete()
-
+    // coin favorite
     @Query("SELECT * FROM favourite")
     fun getAllFavourite(): Flow<List<FavouriteCoinEntity>>
 
-    @Query("UPDATE coin SET favourite =:value WHERE coinId LIKE '%' || :coinId || '%'")
-    suspend fun updateCoinFavourite(coinId: String, value : Boolean)
+    @Query("UPDATE coin_paging_data SET favourite =:value WHERE coinId LIKE '%' || :coinId || '%'")
+    suspend fun updateCoinFavourite(coinId: String, value: Boolean)
 
     @Query("DELETE FROM favourite WHERE coin_id LIKE '%' || :param || '%'")
     suspend fun deleteFavouriteById(param: String)
@@ -56,4 +63,10 @@ interface CoinDao {
     @Query("DELETE FROM favourite")
     suspend fun deleteFavourite()
 
+    // coin search history
+    @Query("SELECT * FROM query_history ORDER BY id ASC")
+    fun getQueryHistory(): Flow<List<QueryHistoryEntity?>?>?
+
+    @Insert(onConflict = REPLACE)
+    suspend fun insertQueryHistory(queryHistoryEntity: QueryHistoryEntity)
 }

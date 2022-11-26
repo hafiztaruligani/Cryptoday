@@ -3,9 +3,10 @@ package com.hafiztaruligani.cryptoday.util
 object Cons {
     const val TAG = "TAG"
 
-    //data cons
-    const val PER_PAGE = 20
-    const val PRE_FETCH_DISTANCE = 5
-    const val UPDATE_DELAY_TIME: Long = 10000 //milisecond
-    const val BANNED_TIME = 120 //server banned call time
+    // data cons
+    const val PAGE_SIZE = 30 // page size for each paging
+    const val PRE_FETCH_DISTANCE = 5 // paging pre fetch distance
+    var UPDATE_DELAY_TIME: Long = 10000 // millisecond
+    const val BANNED_TIME = 120 // server banned call time
+    const val MAX_PAGE_SIZE = 250
 }

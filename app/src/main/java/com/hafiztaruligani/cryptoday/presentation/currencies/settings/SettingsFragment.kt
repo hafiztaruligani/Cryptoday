@@ -15,23 +15,21 @@ import com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.withContext
-
 
 @AndroidEntryPoint
 class SettingsFragment : DialogFragment() {
 
     private lateinit var binding: FragmentSettingsBinding
     private val viewModel by activityViewModels<CurrenciesViewModel>()
-    private lateinit var spinnerAdapter : PairAdapter
+    private lateinit var spinnerAdapter: PairAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSettingsBinding.inflate(layoutInflater)
-
 
         bindSort()
         bindCurrenciesPair()
@@ -65,7 +63,6 @@ class SettingsFragment : DialogFragment() {
         }
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launchWhenResumed {
@@ -77,7 +74,7 @@ class SettingsFragment : DialogFragment() {
                 spinnerAdapter.pairs = currenciesPair.toMutableList()
                 spinnerAdapter.notifyDataSetChanged()
 
-                withContext(Dispatchers.Main){
+                withContext(Dispatchers.Main) {
                     binding.sortBy.check(coinsOrder.sortBy.id)
                     val index = currenciesPair.indexOf(coinsOrder.currencyPair)
                     binding.spinner.setSelection(index)
@@ -85,7 +82,6 @@ class SettingsFragment : DialogFragment() {
             }
         }
         binding.btnApply.setOnClickListener { setResult() }
-
     }
 
     private fun setResult() {
@@ -102,5 +98,4 @@ class SettingsFragment : DialogFragment() {
         super.onStart()
         dialog?.window?.setBackgroundDrawableResource(R.color.transparent)
     }
-
 }

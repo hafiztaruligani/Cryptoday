@@ -5,5 +5,5 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 enum class ListType : Parcelable {
-    ALL, FAVOURITE
+    ALL, FAVORITE
 }

@@ -1,7 +1,7 @@
 package com.hafiztaruligani.cryptoday.presentation.currencies.coinslist
 
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +12,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
+import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
-import androidx.paging.map
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hafiztaruligani.cryptoday.R
@@ -24,18 +24,23 @@ import com.hafiztaruligani.cryptoday.presentation.adapters.FavouriteCoinsAdapter
 import com.hafiztaruligani.cryptoday.presentation.adapters.PagingLoadStateAdapter
 import com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesFragmentDirections
 import com.hafiztaruligani.cryptoday.presentation.currencies.CurrenciesViewModel
-import com.hafiztaruligani.cryptoday.presentation.main.MainActivity
 import com.hafiztaruligani.cryptoday.util.CoinDiffUtil
-import com.hafiztaruligani.cryptoday.util.Cons.TAG
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
+/**
+ * this fragment view have one Recycler View (RC), used to provide coin list information.
+ * there is has two implementation/list type of this fragment:
+ * 1. ALL = showing all coins, the RC adapter is using paging adapter
+ * 2. FAVORITE = showing favorite coins, the RC adapter is using recycler view adapter
+ */
+class CoinsListFragment : Fragment() {
 
-class CoinsListFragment() : Fragment() {
+    // private val TAG = javaClass.simpleName
 
     companion object {
         private const val listTypeArgs = "listType"
-        fun newInstance(listType: ListType) : CoinsListFragment {
+        fun newInstance(listType: ListType): CoinsListFragment {
             val frag = CoinsListFragment()
             val bundle = Bundle()
             bundle.putParcelable(listTypeArgs, listType)
@@ -48,30 +53,31 @@ class CoinsListFragment() : Fragment() {
     private lateinit var binding: FragmentCoinsListBinding
     private var listType: ListType? = null
 
-    private lateinit var coinsRc : RecyclerView
-    private lateinit var pagingAdapter : CoinsAdapter
+    private lateinit var coinsRc: RecyclerView
+    private lateinit var pagingAdapter: CoinsAdapter
     private lateinit var rcAdapter: FavouriteCoinsAdapter
-    private lateinit var layoutManager : LinearLayoutManager
+    private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var pagingLoadStateAdapter: PagingLoadStateAdapter
 
     private val coinDiffUtil = CoinDiffUtil()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
 
         postponeEnterTransition()
         binding = FragmentCoinsListBinding.inflate(layoutInflater)
 
-        listType = arguments?.getParcelable<ListType>(listTypeArgs)
-
         coinsRc = binding.coinsRc
         layoutManager = LinearLayoutManager(context)
         coinsRc.layoutManager = layoutManager
-        Log.d(TAG, "listype: $listType")
-        when(listType){
+
+        setListType()
+        when (listType) {
             ListType.ALL -> setupPaging()
-            ListType.FAVOURITE -> setupRc()
+            ListType.FAVORITE -> setupRc()
             null -> findNavController().popBackStack()
         }
 
@@ -80,115 +86,133 @@ class CoinsListFragment() : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        when(listType){
-            ListType.ALL -> observeAllCoins()
-            ListType.FAVOURITE -> observeFavouriteCoins()
-            null -> findNavController().popBackStack()
-        }
-
+        bindData()
         postponeEnterTransition()
         view.doOnPreDraw { startPostponedEnterTransition() }
     }
 
+    private fun setListType() {
+        listType = if (Build.VERSION.SDK_INT >= 33) {
+            arguments?.getParcelable(listTypeArgs, ListType::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getParcelable(listTypeArgs)
+        }
+    }
+
+    // only called when ListType is FAVORITE
     private fun setupRc() {
-        rcAdapter = FavouriteCoinsAdapter(coinDiffUtil,::navigateToDetail, viewModel::favouriteEvent)
+        rcAdapter = FavouriteCoinsAdapter(
+            coinDiffUtil,
+            ::navigateIntoDetail,
+            viewModel::favouriteEvent
+        )
         coinsRc.adapter = rcAdapter
     }
 
+    // only called when ListType is ALL
     private fun setupPaging() {
-        pagingAdapter = CoinsAdapter(coinDiffUtil, ::navigateToDetail, viewModel::favouriteEvent)
+        pagingAdapter = CoinsAdapter(coinDiffUtil, ::navigateIntoDetail, viewModel::favouriteEvent)
 
-        val pagingLoadStateAdapter= PagingLoadStateAdapter(lifecycleScope){ pagingAdapter.retry() }
+        pagingLoadStateAdapter = PagingLoadStateAdapter(lifecycleScope) {
+            pagingAdapter.retry()
+        }
         coinsRc.adapter = pagingAdapter.withLoadStateFooter(pagingLoadStateAdapter)
         binding.btnRetry.setOnClickListener { pagingAdapter.retry() }
 
-        /*
+        calibrateUi()
+        observeLoadState()
+    }
 
-        var initialLoad = true
-        var notScrolled = false
-coinsRc.addOnScrollListener(object : RecyclerView.OnScrollListener(){
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                notScrolled = dy == 0
+    private fun calibrateUi() {
+
+        // This initiate variable serves as a benchmark for rc to scroll
+        // up when initiating paging data, used when adapter is on update
+        var initiate = false
+        pagingAdapter.addOnPagesUpdatedListener {
+            if (initiate) {
+                coinsRc.scrollToPosition(0)
+                initiate = false
             }
-        })
+        }
 
-        adapter.addLoadStateListener {
-            if (it.source.refresh is LoadState.Loading)
-                Log.d(TAG, "loadstatelistener: new source")
-
-            if (it.mediator?.refresh is LoadState.Loading)
-                Log.d(TAG, "loadstatelistener: new mediator/remote")
-        }*/
-
+        // set initiate variable with true
         lifecycleScope.launch {
-            pagingAdapter.loadStateFlow.collect(){ loadStates ->
-                pagingLoadStateAdapter.loadState = loadStates.mediator?.refresh ?:loadStates.append
-
-                val isError = loadStates.mediator?.refresh is LoadState.Error
-
-                binding.apply {
-                    message.isVisible = isError
-                    btnRetry.isVisible = isError
-                    messageBackground.isVisible = isError
-                    messageBackground.bringToFront()
-                    message.bringToFront()
-                    btnRetry.bringToFront()
-
-                    if(pagingAdapter.itemCount==0) message.text = context?.getString(R.string.network_unavailable)
-                    else message.text = context?.getString(R.string.this_data_is_not_up_to_date)
-
-                    if (loadStates.source.refresh is LoadState.NotLoading && loadStates.append.endOfPaginationReached && pagingAdapter.itemCount < 1) {
-                        coinsRc.isVisible = false
-                        coinNotFound.isVisible = true
-                    } else {
-                        coinsRc.isVisible = true
-                        coinNotFound.isVisible = false
-                    }
-                }
-
-            }
-        }
-    }
-
-    private fun observeFavouriteCoins() {
-        lifecycleScope.launchWhenResumed {
-            viewModel.favouriteCoins.collectLatest {
-                binding.apply {
-                    coinsRc.isVisible = it.isNotEmpty()
-                    coinNotFound.isVisible = it.isEmpty()
-                }
-                rcAdapter.list.submitList(it)
-            }
-        }
-    }
-
-    private fun observeAllCoins() {
-        lifecycleScope.launchWhenResumed{
-
             launch {
-                viewModel.coins.collectLatest {
-                    var a = ""
-                    it.map { c-> a =c.id }
-                    Log.d(TAG, "bug observeAllCoins: ${a}")
-                    pagingAdapter.submitData(it)
-                }
+                pagingAdapter.loadStateFlow
+                    .distinctUntilChangedBy { it.mediator?.refresh }
+                    .filter { it.mediator?.refresh is LoadState.NotLoading }
+                    .collect {
+                        initiate = true
+                    }
             }
-            var needToScroll = true
-            pagingAdapter.addOnPagesUpdatedListener {
-                if(needToScroll && pagingAdapter.itemCount > 0){
-                    binding.coinsRc.scrollToPosition(0)
-                    viewModel.alreadyScroll()
-                }
-            }
-
-            viewModel.needToScroll.collectLatest {
-                needToScroll = it
-            }
-
         }
     }
 
-    private fun navigateToDetail(coinData: Coin, viewItem: View) {
+    // collecting load state to used by pagingLoadStateAdapter and error indicator
+    private fun observeLoadState() {
+        lifecycleScope.launch {
+            pagingAdapter.loadStateFlow.collect { loadStates ->
+                pagingLoadStateAdapter.loadState = loadStates.mediator?.append ?: loadStates.append
+                setErrorListener(loadStates)
+            }
+        }
+    }
+
+    private fun setErrorListener(loadStates: CombinedLoadStates) {
+        binding.apply {
+
+            val isError = loadStates.mediator?.refresh is LoadState.Error
+            message.isVisible = isError
+            btnRetry.isVisible = isError
+            messageBackground.isVisible = isError
+            messageBackground.bringToFront()
+            message.bringToFront()
+            btnRetry.bringToFront()
+
+            if (pagingAdapter.itemCount == 0) message.text =
+                context?.getString(R.string.network_unavailable)
+            else message.text = context?.getString(R.string.this_data_is_not_up_to_date)
+
+            val isEmptyData: Boolean = loadStates.source.refresh is LoadState.NotLoading &&
+                loadStates.append.endOfPaginationReached &&
+                pagingAdapter.itemCount < 1
+
+            coinsRc.isVisible = !isEmptyData
+            coinNotFound.isVisible = isEmptyData
+        }
+    }
+
+    private fun bindData() {
+        lifecycleScope.launch {
+            when (listType) {
+                ListType.ALL -> observeAllCoins()
+                ListType.FAVORITE -> observeFavouriteCoins()
+                null -> findNavController().popBackStack()
+            }
+        }
+    }
+
+    // only called when ListType is Favorite
+    private suspend fun observeFavouriteCoins() {
+        viewModel.favouriteCoins.collectLatest {
+            binding.apply {
+                coinsRc.isVisible = it.isNotEmpty()
+                coinNotFound.isVisible = it.isEmpty()
+            }
+            rcAdapter.list.submitList(it)
+        }
+    }
+
+    // only called when ListType is ALL
+    private suspend fun observeAllCoins() {
+        viewModel.coinPagingData.collectLatest {
+            pagingAdapter.submitData(it)
+        }
+    }
+
+    // navigation into detail fragment
+    private fun navigateIntoDetail(coinData: Coin, viewItem: View) {
         val extras = FragmentNavigatorExtras(viewItem to coinData.id)
         val action = CurrenciesFragmentDirections.actionCurrenciesFragmentToDetailFragment(coinData)
         findNavController().navigate(
@@ -197,7 +221,8 @@ coinsRc.addOnScrollListener(object : RecyclerView.OnScrollListener(){
         )
     }
 
-    fun scrollToTop(){
+    // called from Currencies Fragment (parent fragment), to handle when tab item clicked
+    fun scrollToTop() {
         coinsRc.smoothScrollToPosition(0)
     }
 }

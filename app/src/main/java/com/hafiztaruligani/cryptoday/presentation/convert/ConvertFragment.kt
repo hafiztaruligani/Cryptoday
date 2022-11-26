@@ -39,7 +39,8 @@ class ConvertFragment : Fragment() {
     private lateinit var adapter2: AutoCompleteAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentConvertBinding.inflate(layoutInflater).apply {
@@ -56,12 +57,12 @@ class ConvertFragment : Fragment() {
             viewModel.uiState.collectLatest { uiState ->
                 uiState.apply {
 
-                    Log.d(TAG, "uistate: $loading1 ${coins1SearchResult?.size?:"null"}")
-                    
-                    if((!loading1 && coins1SearchResult?.size == 0) || (!loading2 && coins2SearchResult?.size == 0)) {
+                    Log.d(TAG, "uistate: $loading1 ${coins1SearchResult?.size ?: "null"}")
+
+                    if ((!loading1 && coins1SearchResult?.size == 0) || (!loading2 && coins2SearchResult?.size == 0)) {
                         Toast.makeText(requireContext(), "Coin Not Found", Toast.LENGTH_LONG).show()
                     }
-                    
+
                     if (error.isNotBlank())
                         Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
 
@@ -74,7 +75,7 @@ class ConvertFragment : Fragment() {
                     (!loading1).let {
                         binding.logo1.isVisible = it
                         binding.coin1Amount.isEnabled = it
-                        coin1?.name?.let { t->
+                        coin1?.name?.let { t ->
                             binding.coin1AutoComplete.setAdapter(null)
                             binding.coin1AutoComplete.setText(t)
                             binding.coin1AutoComplete.setAdapter(adapter1)
@@ -83,27 +84,26 @@ class ConvertFragment : Fragment() {
                     (!loading2).let {
                         binding.logo2.isVisible = it
                         binding.coin2Amount.isEnabled = it
-                        coin2?.name?.let { t->
+                        coin2?.name?.let { t ->
                             binding.coin2AutoComplete.setAdapter(null)
                             binding.coin2AutoComplete.setText(t)
                             binding.coin2AutoComplete.setAdapter(adapter2)
                         }
                     }
 
-                    coins1SearchResult?.let { adapter1.setData(it) }?:adapter1.notifyDataSetInvalidated()
-                    coins2SearchResult?.let { adapter2.setData(it) }?:adapter2.notifyDataSetInvalidated()
+                    coins1SearchResult?.let { adapter1.setData(it) } ?: adapter1.notifyDataSetInvalidated()
+                    coins2SearchResult?.let { adapter2.setData(it) } ?: adapter2.notifyDataSetInvalidated()
 
                     result?.let { result ->
                         if (!coin1Focus) binding.coin1Amount.setText(result.first)
                         if (!coin2Focus) binding.coin2Amount.setText(result.second)
                     }
-                    
                 }
             }
         }
     }
 
-    private fun setupAutoComplete(){
+    private fun setupAutoComplete() {
         binding.apply {
 
             adapter1 = AutoCompleteAdapter(requireContext(), R.layout.item_autocomplete_coin)
@@ -126,11 +126,11 @@ class ConvertFragment : Fragment() {
             }
 
             coin1Amount.addTextChangedListener {
-                if(it.toString().isNotBlank() && it.toString().last()!='.')
+                if (it.toString().isNotBlank() && it.toString().last() != '.')
                     viewModel.postCoinAmount1(it.toString())
             }
             coin2Amount.addTextChangedListener {
-                if(it.toString().isNotBlank() && it.toString().last()!='.')
+                if (it.toString().isNotBlank() && it.toString().last() != '.')
                     viewModel.postCoinAmount2(it.toString())
             }
             coin1Amount.setOnFocusChangeListener { _, b ->
@@ -141,5 +141,4 @@ class ConvertFragment : Fragment() {
             }
         }
     }
-
 }

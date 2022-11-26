@@ -3,7 +3,6 @@ package com.hafiztaruligani.cryptoday.data.remote
 import com.hafiztaruligani.cryptoday.data.remote.dto.CoinResponse
 import com.hafiztaruligani.cryptoday.data.remote.dto.coindetail.CoinDetailResponse
 import com.hafiztaruligani.cryptoday.data.remote.dto.search.SearchResponse
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -27,12 +26,12 @@ interface ApiService {
         @Path("coinId") coinId: String,
         @Query("vs_currency") vsCurrency: String = "USD"
 
-        ): CoinDetailResponse
+    ): CoinDetailResponse
 
     @GET("search")
     suspend fun search(
         @Query("query") params: String
-    ):SearchResponse
+    ): SearchResponse
 
     @GET("simple/supported_vs_currencies")
     suspend fun getSupportedPair(): List<String>

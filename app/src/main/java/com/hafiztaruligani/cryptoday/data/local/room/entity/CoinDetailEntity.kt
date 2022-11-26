@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.hafiztaruligani.cryptoday.domain.model.CoinDetail
 
 @Entity(tableName = "coin_detail")
-data class CoinDetailEntity (
+data class CoinDetailEntity(
     @PrimaryKey(autoGenerate = false)
     val coinId: String,
 
@@ -14,12 +14,12 @@ data class CoinDetailEntity (
     val link: String,
 
     val description: String,
-){
-    fun toCoinDetail(): CoinDetail{
+) {
+    fun toCoinDetail(): CoinDetail {
         return CoinDetail(
-            genesisDate= genesisDate,
-            link= link,
-            description= description,
+            genesisDate = genesisDate,
+            link = link,
+            description = description,
         )
     }
 }

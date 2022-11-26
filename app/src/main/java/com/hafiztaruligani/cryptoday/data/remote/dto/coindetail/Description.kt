@@ -4,6 +4,6 @@ import com.google.gson.annotations.SerializedName
 
 data class Description(
 
-	@field:SerializedName("en")
-	val en: String? = null
+    @field:SerializedName("en")
+    val en: String? = null
 )

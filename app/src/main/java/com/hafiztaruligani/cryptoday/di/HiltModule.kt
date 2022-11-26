@@ -1,10 +1,10 @@
 package com.hafiztaruligani.cryptoday.di
 
 import android.content.Context
-import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.hafiztaruligani.cryptoday.BuildConfig
 import com.hafiztaruligani.cryptoday.data.local.datastore.DataStoreHelper
+import com.hafiztaruligani.cryptoday.data.local.datastore.DataStoreHelperImpl
 import com.hafiztaruligani.cryptoday.data.local.room.AppDatabase
 import com.hafiztaruligani.cryptoday.data.local.room.CoinDao
 import com.hafiztaruligani.cryptoday.data.local.room.CoinRemoteKeyDao
@@ -18,16 +18,17 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object HiltModule {
 
+    // Remote API config
     @Provides
     @Singleton
     fun provideApi(): ApiService {
@@ -45,7 +46,7 @@ object HiltModule {
             .create(ApiService::class.java)
     }
 
-
+    // coin repository
     @Provides
     @Singleton
     fun provideCoinRepository(
@@ -54,41 +55,47 @@ object HiltModule {
         coinRemoteKeyDao: CoinRemoteKeyDao,
         dataStoreHelper: DataStoreHelper,
         userRepository: UserRepository,
-        firestore: FirebaseFirestore
-    ): CoinRepository{
+        fireStore: FirebaseFirestore
+    ): CoinRepository {
         return CoinRepositoryImpl(
             apiService = apiService,
             coinDao = coinDao,
             coinRemoteKeyDao = coinRemoteKeyDao,
             dataStoreHelper = dataStoreHelper,
             userRepository = userRepository,
-            firestore = firestore
+            fireStore = fireStore
         )
     }
 
+    // user repository
     @Provides
     @Singleton
     fun provideUserRepository(dataStoreHelper: DataStoreHelper): UserRepository = UserRepositoryImpl(dataStoreHelper)
 
+    // app database
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase = AppDatabase.getInstance(context)
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase = AppDatabase.getDatabaseInstance(context)
+
+    // provide coin database
+    @Provides
+    @Singleton
+    fun provideCoinDao(appDatabase: AppDatabase): CoinDao =
+        appDatabase.coinDao()
+
+    // provide remote key database
+    @Provides
+    @Singleton
+    fun provideCoinRemoteKeyDao(appDatabase: AppDatabase): CoinRemoteKeyDao =
+        appDatabase.coinRemoteKeyDao()
 
     @Provides
     @Singleton
-    fun provideCoinDao(appDatabase: AppDatabase): CoinDao =appDatabase.coinDao()
+    fun provideDataStoreHelper(@ApplicationContext context: Context): DataStoreHelper = DataStoreHelperImpl(context)
 
     @Provides
     @Singleton
-    fun provideCoinRemoteKeyDao(appDatabase: AppDatabase): CoinRemoteKeyDao =appDatabase.coinRemoteKeyDao()
-
-    @Provides
-    @Singleton
-    fun provideDataStoreHelper(@ApplicationContext context: Context): DataStoreHelper = DataStoreHelper(context)
-
-    @Provides
-    @Singleton
-    fun provideFirestore(@ApplicationContext context: Context): FirebaseFirestore {
+    fun provideFireStore(@ApplicationContext context: Context): FirebaseFirestore {
         context.apply { return FirebaseFirestore.getInstance() }
     }
 }

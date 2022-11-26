@@ -19,13 +19,11 @@ class LoadingBar(context: Context) : Dialog(context) {
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
-    fun state(value : Boolean){
+    fun state(value: Boolean) {
         Log.d(TAG, "state: called $value")
         if (value) this@LoadingBar.show()
         else this@LoadingBar.dismiss()
     }
-
-
 
     override fun onBackPressed() {
     }

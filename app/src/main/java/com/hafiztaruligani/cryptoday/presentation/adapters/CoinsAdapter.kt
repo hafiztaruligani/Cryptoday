@@ -1,6 +1,5 @@
 package com.hafiztaruligani.cryptoday.presentation.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,8 +20,8 @@ class CoinsAdapter(
     coinDiffUtil: CoinDiffUtil,
     private val coinDetailClick: (Coin, View) -> Unit,
     private val favouriteClick: ((Coin) -> Boolean)
-)
-    :PagingDataAdapter<Coin, CoinsAdapter.CoinViewHolder>(coinDiffUtil) {
+) :
+    PagingDataAdapter<Coin, CoinsAdapter.CoinViewHolder>(coinDiffUtil) {
 
     inner class CoinViewHolder(val binding: ItemCoinBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -56,10 +55,10 @@ class CoinsAdapter(
             currentPrice.text = marketData?.fiatFormat(marketData.currentPrice)
 
             coinData?.marketData?.priceChangePercentage?.let {
-                if(it>=0) {
+                if (it >= 0) {
                     iconArrow.glide(root.context, R.drawable.ic_baseline_arrow_drop_up_24)
                     priceChangePercentage.setTextColor(ContextCompat.getColor(root.context, R.color.up))
-                }else{
+                } else {
                     iconArrow.glide(root.context, R.drawable.ic_baseline_arrow_drop_down_24)
                     priceChangePercentage.setTextColor(ContextCompat.getColor(root.context, R.color.down))
                 }
@@ -67,20 +66,18 @@ class CoinsAdapter(
 
             priceChangePercentage.text = marketData?.percentageFormatter(
                 marketData.priceChangePercentage
-            )?.apply { if (length > 1) replace("-","") }
-
+            )?.apply { if (length > 1) replace("-", "") }
 
             coinData?.id?.let {
 
-                setFavourite(btnFavourite, coinData.favourite)
-
+                setFavourite(btnFavourite, coinData.isFavorite)
 
                 btnFavourite.setOnClickListener {
-                    coinData.favourite = !coinData.favourite
+                    coinData.isFavorite = !coinData.isFavorite
 
                     val isSuccess = favouriteClick.invoke(coinData)
-                    if(isSuccess) setFavourite(btnFavourite, coinData.favourite)
-                    else coinData.favourite = !coinData.favourite
+                    if (isSuccess) setFavourite(btnFavourite, coinData.isFavorite)
+                    else coinData.isFavorite = !coinData.isFavorite
                 }
             }
 
@@ -96,5 +93,4 @@ class CoinsAdapter(
         if (favourite) btnFavourite.glide(btnFavourite.context, R.drawable.ic_favourite_on)
         else btnFavourite.glide(btnFavourite.context, R.drawable.ic_favourite_off)
     }
-
 }
