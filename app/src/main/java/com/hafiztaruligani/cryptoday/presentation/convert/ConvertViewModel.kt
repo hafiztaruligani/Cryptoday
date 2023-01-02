@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.usecase.coin.GetCoinUseCase
-import com.hafiztaruligani.cryptoday.domain.usecase.coin.SearchCoinIdUseCase
+import com.hafiztaruligani.cryptoday.domain.usecase.coin.SearchCoinSimpleUseCase
+import com.hafiztaruligani.cryptoday.util.Cons
 import com.hafiztaruligani.cryptoday.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -14,7 +15,7 @@ import kotlinx.coroutines.flow.*
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class ConvertViewModel @Inject constructor(
-    private val searchCoinIdUseCase: SearchCoinIdUseCase,
+    private val searchCoinSimpleUseCase: SearchCoinSimpleUseCase,
     private val getCoinUseCase: GetCoinUseCase
 ) : ViewModel() {
 
@@ -25,15 +26,20 @@ class ConvertViewModel @Inject constructor(
         viewModelScope.launch {
             launch {
                 collectLatest {
-                    if (!_uiState.value.loading1) _uiState.value = _uiState.value.copy(loading1 = true)
+                    if (!_uiState.value.loading1)
+                        _uiState.value = _uiState.value.copy(coin1 = null, loading1 = true)
                 }
             }
-            debounce(2000).collectLatest { param ->
-                searchCoinIdUseCase.invoke(param).collectLatest { resource ->
+            debounce(Cons.QUERY_DELAY_TIME).collectLatest { param ->
+                searchCoinSimpleUseCase.invoke(param).collectLatest { resource ->
                     _uiState.value = when (resource) {
-                        is Resource.Success -> ConvertUiState(coins1SearchResult = resource.data, coins2SearchResult = _uiState.value.coins2SearchResult, error = "")
+                        is Resource.Success -> ConvertUiState(
+                            coins1SearchResult = resource.data,
+                            coins2SearchResult = _uiState.value.coins2SearchResult,
+                            error = ""
+                        )
                         is Resource.Error -> ConvertUiState(error = resource.message)
-                        is Resource.Loading -> _uiState.value.copy(loading1 = true)
+                        is Resource.Loading -> _uiState.value.copy(coin1 = null, loading1 = true)
                     }
                 }
             }
@@ -44,15 +50,20 @@ class ConvertViewModel @Inject constructor(
         viewModelScope.launch {
             launch {
                 collectLatest {
-                    if (!_uiState.value.loading2) _uiState.value = _uiState.value.copy(loading2 = true)
+                    if (!_uiState.value.loading2)
+                        _uiState.value = _uiState.value.copy(coin2 = null, loading2 = true)
                 }
             }
-            debounce(2000).collectLatest { param ->
-                searchCoinIdUseCase.invoke(param).collectLatest { resource ->
+            debounce(Cons.QUERY_DELAY_TIME).collectLatest { param ->
+                searchCoinSimpleUseCase.invoke(param).collectLatest { resource ->
                     _uiState.value = when (resource) {
-                        is Resource.Success -> ConvertUiState(coins1SearchResult = _uiState.value.coins1SearchResult, coins2SearchResult = resource.data, error = "")
+                        is Resource.Success -> ConvertUiState(
+                            coins1SearchResult = _uiState.value.coins1SearchResult,
+                            coins2SearchResult = resource.data,
+                            error = ""
+                        )
                         is Resource.Error -> ConvertUiState(error = resource.message)
-                        is Resource.Loading -> _uiState.value.copy(loading2 = true)
+                        is Resource.Loading -> _uiState.value.copy(coin2 = null, loading2 = true)
                     }
                 }
             }
@@ -70,12 +81,12 @@ class ConvertViewModel @Inject constructor(
         if (_coin2Id.value != coinId) _coin2Id.value = coinId
     }
 
-    private val coin1: StateFlow<Coin?> = _coin1Id.flatMapLatest {
+    private val coin1: StateFlow<Coin> = _coin1Id.flatMapLatest {
         getCoinUseCase.invoke(it).filter { resource ->
             when (resource) {
                 is Resource.Success -> {
                     _uiState.value = _uiState.value.copy(coin1 = resource.data, error = "")
-                    postCoinAmount1("1.0")
+                    // postCoinAmount1("1.0")
                     true
                 }
                 is Resource.Error -> {
@@ -91,14 +102,14 @@ class ConvertViewModel @Inject constructor(
             val a = resource as Resource.Success<Coin>
             a.data
         }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Coin())
 
-    private val coin2 = _coin2Id.flatMapLatest {
+    private val coin2: StateFlow<Coin> = _coin2Id.flatMapLatest {
         getCoinUseCase.invoke(it).filter { resource ->
             when (resource) {
                 is Resource.Success -> {
                     _uiState.value = _uiState.value.copy(coin2 = resource.data, error = "")
-                    postCoinAmount1("1.0")
+                    // postCoinAmount1("1.0")
                     true
                 }
                 is Resource.Error -> {
@@ -114,7 +125,7 @@ class ConvertViewModel @Inject constructor(
             val a = resource as Resource.Success<Coin>
             a.data
         }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Coin())
 
     fun postCoinAmount1(value: String) {
         viewModelScope.launch {
@@ -126,7 +137,12 @@ class ConvertViewModel @Inject constructor(
                 val price2 = it.second?.marketData?.currentPrice ?: return@collectLatest
 
                 val r2 = (price1 / price2) * value.toDouble()
-                _uiState.value = _uiState.value.copy(result = Pair(value, r2.toString()))
+                _uiState.value = _uiState.value.copy(
+                    result = Pair(
+                        value,
+                        r2.toString().take(15)
+                    )
+                )
             }
         }
     }
@@ -141,7 +157,12 @@ class ConvertViewModel @Inject constructor(
                 val price2 = it.second?.marketData?.currentPrice ?: return@collectLatest
 
                 val r1 = (price2 / price1) * value.toDouble()
-                _uiState.value = _uiState.value.copy(result = Pair(r1.toString(), value))
+                _uiState.value = _uiState.value.copy(
+                    result = Pair(
+                        r1.toString().take(15),
+                        value
+                    )
+                )
             }
         }
     }
@@ -155,5 +176,4 @@ class ConvertViewModel @Inject constructor(
         coin1Param.value = coin2Param.value
         coin2Param.value = tmp
     }
-
 }

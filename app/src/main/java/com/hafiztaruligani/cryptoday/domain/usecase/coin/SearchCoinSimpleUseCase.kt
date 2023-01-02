@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 
-class SearchCoinIdUseCase @Inject constructor(
-    val coinRepository: CoinRepository
+class SearchCoinSimpleUseCase @Inject constructor(
+    private val coinRepository: CoinRepository
 ) {
     suspend operator fun invoke(params: String): Flow<Resource<List<CoinSimple>>> = flow {
         emit(Resource.Loading())

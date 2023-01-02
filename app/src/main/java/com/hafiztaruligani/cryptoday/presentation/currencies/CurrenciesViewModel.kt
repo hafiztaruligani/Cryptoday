@@ -9,9 +9,11 @@ import com.hafiztaruligani.cryptoday.domain.usecase.coin.CoinsOrder
 import com.hafiztaruligani.cryptoday.domain.usecase.coin.GetCoinsPagedUseCase
 import com.hafiztaruligani.cryptoday.domain.usecase.coin.GetCurrenciesPairUseCase
 import com.hafiztaruligani.cryptoday.domain.usecase.coin.SortBy
-import com.hafiztaruligani.cryptoday.domain.usecase.favourite.FavouriteUseCase
+import com.hafiztaruligani.cryptoday.domain.usecase.favourite.FavoriteEventUseCase
+import com.hafiztaruligani.cryptoday.domain.usecase.favourite.GetFavoriteCoinsUseCase
 import com.hafiztaruligani.cryptoday.domain.usecase.user.UserUseCase
 import com.hafiztaruligani.cryptoday.presentation.currencies.settings.SettingUiState
+import com.hafiztaruligani.cryptoday.util.Cons
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,16 +24,19 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class CurrenciesViewModel @Inject constructor(
     private val getCoinsUseCase: GetCoinsPagedUseCase,
-    private val favouriteUseCase: FavouriteUseCase,
     private val userUseCase: UserUseCase,
+    private val getFavoriteCoinsUseCase: GetFavoriteCoinsUseCase,
+    private val favoriteEventUseCase: FavoriteEventUseCase,
     getCurrenciesPairUseCase: GetCurrenciesPairUseCase
 ) : ViewModel() {
 
@@ -41,7 +46,7 @@ class CurrenciesViewModel @Inject constructor(
 
     private val coinsOrder = combine(
         sortBy,
-        query.debounce(1000),
+        query.debounce(Cons.QUERY_DELAY_TIME),
         userCurrencyPair
     ) { a, b, c ->
         CoinsOrder(
@@ -51,7 +56,7 @@ class CurrenciesViewModel @Inject constructor(
         )
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = CoinsOrder())
 
-    var coinPagingData: Flow<PagingData<Coin>> = coinsOrder
+    val coinPagingData: Flow<PagingData<Coin>> = coinsOrder
         .flatMapLatest { getCoinsUseCase.invoke(it) }
         .cachedIn(viewModelScope)
 
@@ -65,19 +70,21 @@ class CurrenciesViewModel @Inject constructor(
     private val _currenciesUiState = MutableStateFlow(CurrenciesUiState())
     val currenciesUiState: StateFlow<CurrenciesUiState> = _currenciesUiState
 
-    private val isLogin: StateFlow<Boolean> = userUseCase.getUserName.invoke()
-        .mapLatest { it.isNotEmpty() }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
-
+    // return isSuccess, depend on is user login
     fun favouriteEvent(coin: Coin): Boolean {
-        return if (!isLogin.value) {
+        val login: Boolean = runBlocking { isLogin() }
+        return if (!login) {
             needLogin(true)
             false
         } else {
-            favouriteUseCase.favouriteEvent.invoke(coin)
+            favoriteEventUseCase.invoke(coin)
             true
         }
     }
+
+    private suspend fun isLogin() = userUseCase
+        .getUserName.invoke().firstOrNull()?.isNotEmpty()
+        ?: false
 
     fun postUserCurrencyPair(value: String) {
         userUseCase.setUserCurrencyPair.invoke(value)
@@ -93,7 +100,7 @@ class CurrenciesViewModel @Inject constructor(
     }
 
     val favouriteCoins = coinsOrder.flatMapLatest {
-        favouriteUseCase.getFavouriteCoins.invoke(it)
+        getFavoriteCoinsUseCase.invoke(it)
     }
 
     fun onClickButtonClear() {

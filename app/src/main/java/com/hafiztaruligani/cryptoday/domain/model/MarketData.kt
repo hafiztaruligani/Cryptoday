@@ -23,7 +23,21 @@ data class MarketData(
     var lastUpdate: String
 ) : Parcelable {
 
-    constructor() : this("", null, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, "", "")
+    constructor(currentPrice: Double? = null) : this(
+        "",
+        null,
+        currentPrice ?: 0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        "",
+        ""
+    )
+
     companion object {
         private val formatter = NumberFormat.getCurrencyInstance()
     }

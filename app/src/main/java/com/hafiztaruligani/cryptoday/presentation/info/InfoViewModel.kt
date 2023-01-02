@@ -15,5 +15,6 @@ class InfoViewModel @Inject constructor(
     private val userUseCase: UserUseCase
 ) : ViewModel() {
     val description = MutableStateFlow("Cryptoday is an application that displays the latest price information for cryptocurrencies. The information is sourced from www.coingecko.com.")
-    val userName: StateFlow<String> = userUseCase.getUserName.invoke().stateIn(viewModelScope, SharingStarted.Eagerly, "")
+    val userName: StateFlow<String> = userUseCase.getUserName.invoke()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "")
 }

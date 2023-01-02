@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class FavouriteEvent @Inject constructor(private val coinRepository: CoinRepository) {
+class FavoriteEventUseCase @Inject constructor(private val coinRepository: CoinRepository) {
     operator fun invoke(coin: Coin) = CoroutineScope(Dispatchers.IO).launch {
         if (coin.isFavorite) coinRepository.addFavourite(coin)
         else coinRepository.deleteFavouriteById(coin.id)

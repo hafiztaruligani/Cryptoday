@@ -31,3 +31,5 @@ suspend fun <T : Any> PagingData<T>.testData(): List<T> {
     dif.collectFrom(this)
     return items
 }
+
+fun errorNull(): Nothing = throw NullPointerException("ERROR NULL")

@@ -8,7 +8,7 @@
     <data>
         <import type="android.view.View"/>
         <variable
-            name="viewmodel"
+            name="viewModel"
             type="com.hafiztaruligani.cryptoday.presentation.convert.ConvertViewModel" />
     </data>
 
@@ -38,7 +38,7 @@
             android:background="@drawable/rounded_edit_text"
             android:inputType="text"
             android:paddingHorizontal="8dp"
-            android:text="@={viewmodel.coin1Param}"
+            android:text="@={viewModel.coin1Param}"
             android:maxLines="1"
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -91,7 +91,7 @@
             app:layout_constraintTop_toBottomOf="@id/coin1_amount"
             android:clickable="true"
             android:focusable="true"
-            android:onClickListener="@{()-> viewmodel.swap()}"
+            android:onClickListener="@{()-> viewModel.swap()}"
             />
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -102,7 +102,7 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/rounded_edit_text"
             android:paddingHorizontal="8dp"
-            android:text="@={viewmodel.coin2Param}"
+            android:text="@={viewModel.coin2Param}"
             android:maxLines="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

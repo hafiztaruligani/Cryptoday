@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hafiztaruligani.cryptoday.domain.model.Coin
 import com.hafiztaruligani.cryptoday.domain.usecase.coin.GetCoinWithDetailUseCase
-import com.hafiztaruligani.cryptoday.domain.usecase.favourite.FavouriteUseCase
+import com.hafiztaruligani.cryptoday.domain.usecase.favourite.FavoriteEventUseCase
 import com.hafiztaruligani.cryptoday.domain.usecase.user.GetUserName
 import com.hafiztaruligani.cryptoday.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class DetailViewModel @Inject constructor(
     private val getCoinWithDetailUseCase: GetCoinWithDetailUseCase,
     private val getUserName: GetUserName,
-    private val favouriteUseCase: FavouriteUseCase
+    private val favoriteEventUseCase: FavoriteEventUseCase
 ) : ViewModel() {
 
     private val _detailUiState = MutableLiveData<DetailUiState>()
@@ -43,7 +43,7 @@ class DetailViewModel @Inject constructor(
         return when {
             !isLogin.value -> false
             else -> {
-                favouriteUseCase.favouriteEvent.invoke(coin)
+                favoriteEventUseCase.invoke(coin)
                 true
             }
         }

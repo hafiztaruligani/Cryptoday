@@ -14,6 +14,15 @@ data class Coin(
     var isFavorite: Boolean = false
 ) : Parcelable {
 
+    constructor() : this(
+        id = "",
+        symbol = "",
+        name = "",
+        image = "",
+        marketData = MarketData(),
+        isFavorite = false,
+    )
+
     fun getTitle() =
         if (marketData.marketCapRank == null) "$name (${symbol.uppercase()})"
         else "#${marketData.marketCapRank} $name (${symbol.uppercase()})"

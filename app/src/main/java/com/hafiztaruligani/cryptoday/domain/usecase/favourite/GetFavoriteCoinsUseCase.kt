@@ -8,7 +8,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class GetFavouriteCoins @Inject constructor(
+class GetFavoriteCoinsUseCase @Inject constructor(
     private val coinRepository: CoinRepository
 ) {
     operator fun invoke(coinsOrder: CoinsOrder): Flow<List<Coin>> {
