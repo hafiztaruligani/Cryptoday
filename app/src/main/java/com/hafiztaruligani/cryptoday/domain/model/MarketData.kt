@@ -2,6 +2,7 @@ package com.hafiztaruligani.cryptoday.domain.model
 
 import android.os.Parcelable
 import android.util.Log
+import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
@@ -11,7 +12,7 @@ import kotlinx.parcelize.Parcelize
 data class MarketData(
     val timeUnit: String,
     val marketCapRank: Int?,
-    val currentPrice: Double,
+    val currentPrice: BigDecimal,
     val priceChangePercentage: Double,
     val low: Double,
     val high: Double,
@@ -23,10 +24,10 @@ data class MarketData(
     var lastUpdate: String
 ) : Parcelable {
 
-    constructor(currentPrice: Double? = null) : this(
+    constructor(currentPrice: BigDecimal? = null) : this(
         "",
         null,
-        currentPrice ?: 0.0,
+        currentPrice ?: (0).toBigDecimal(),
         0.0,
         0.0,
         0.0,

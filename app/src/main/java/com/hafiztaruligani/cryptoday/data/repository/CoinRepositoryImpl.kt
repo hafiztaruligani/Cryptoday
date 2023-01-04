@@ -249,6 +249,7 @@ class CoinRepositoryImpl(
                 result.add(
                     CoinSimple(
                         id = it.id,
+                        symbol = it.symbol ?: "",
                         logo = it.thumb,
                         marketCapRank = it.marketCapRank ?: 19999,
                         name = it.name ?: it.id

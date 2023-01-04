@@ -6,6 +6,9 @@ data class CoinsItem(
     @field:SerializedName("name")
     val name: String? = null,
 
+    @field:SerializedName("symbol")
+    val symbol: String? = null,
+
     @field:SerializedName("market_cap_rank")
     val marketCapRank: Int? = null,
 
@@ -14,4 +17,5 @@ data class CoinsItem(
 
     @field:SerializedName("large")
     val thumb: String? = null
+
 )

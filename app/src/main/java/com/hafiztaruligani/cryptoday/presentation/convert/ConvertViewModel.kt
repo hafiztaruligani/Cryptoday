@@ -7,7 +7,9 @@ import com.hafiztaruligani.cryptoday.domain.usecase.coin.GetCoinUseCase
 import com.hafiztaruligani.cryptoday.domain.usecase.coin.SearchCoinSimpleUseCase
 import com.hafiztaruligani.cryptoday.util.Cons
 import com.hafiztaruligani.cryptoday.util.Resource
+import com.hafiztaruligani.cryptoday.util.notZero
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.math.RoundingMode
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -22,7 +24,7 @@ class ConvertViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ConvertUiState())
     val uiState: StateFlow<ConvertUiState> = _uiState
 
-    val coin1Param = MutableStateFlow("Bitcoin").apply {
+    val coin1Param = MutableStateFlow("Bitcoin (BTC)").apply {
         viewModelScope.launch {
             launch {
                 collectLatest {
@@ -46,7 +48,7 @@ class ConvertViewModel @Inject constructor(
         }
     }
 
-    val coin2Param = MutableStateFlow("Ethereum").apply {
+    val coin2Param = MutableStateFlow("Ethereum (ETH)").apply {
         viewModelScope.launch {
             launch {
                 collectLatest {
@@ -72,7 +74,6 @@ class ConvertViewModel @Inject constructor(
 
     private val _coin1Id = MutableStateFlow("bitcoin")
     private val _coin2Id = MutableStateFlow("ethereum")
-
     fun postCoinId1(coinId: String) {
         if (_coin1Id.value != coinId) _coin1Id.value = coinId
     }
@@ -86,7 +87,6 @@ class ConvertViewModel @Inject constructor(
             when (resource) {
                 is Resource.Success -> {
                     _uiState.value = _uiState.value.copy(coin1 = resource.data, error = "")
-                    // postCoinAmount1("1.0")
                     true
                 }
                 is Resource.Error -> {
@@ -109,7 +109,6 @@ class ConvertViewModel @Inject constructor(
             when (resource) {
                 is Resource.Success -> {
                     _uiState.value = _uiState.value.copy(coin2 = resource.data, error = "")
-                    // postCoinAmount1("1.0")
                     true
                 }
                 is Resource.Error -> {
@@ -127,42 +126,24 @@ class ConvertViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Coin())
 
-    fun postCoinAmount1(value: String) {
+    val amount = MutableStateFlow("1").apply {
         viewModelScope.launch {
-            combine(coin1, coin2) { a, b ->
-                Pair(a, b)
+            combine(coin1, coin2, this@apply) { a, b, c ->
+                Triple(a, b, c)
             }.collectLatest {
+                val amount = it.third
+                val price1 = it.first.marketData.currentPrice
+                val price2 = it.second.marketData.currentPrice
+                val valueIsValid = amount.isNotBlank() && price1.notZero() && price2.notZero()
+                if (valueIsValid) {
+                    val result = price1.divide(
+                        price2, 20, RoundingMode.HALF_EVEN
+                    ) * amount.toBigDecimal()
 
-                val price1 = it.first?.marketData?.currentPrice ?: return@collectLatest
-                val price2 = it.second?.marketData?.currentPrice ?: return@collectLatest
-
-                val r2 = (price1 / price2) * value.toDouble()
-                _uiState.value = _uiState.value.copy(
-                    result = Pair(
-                        value,
-                        r2.toString().take(15)
+                    _uiState.value = _uiState.value.copy(
+                        result = result.toString()
                     )
-                )
-            }
-        }
-    }
-
-    fun postCoinAmount2(value: String) {
-        viewModelScope.launch {
-            combine(coin1, coin2) { a, b ->
-                Pair(a, b)
-            }.collectLatest {
-
-                val price1 = it.first?.marketData?.currentPrice ?: return@collectLatest
-                val price2 = it.second?.marketData?.currentPrice ?: return@collectLatest
-
-                val r1 = (price2 / price1) * value.toDouble()
-                _uiState.value = _uiState.value.copy(
-                    result = Pair(
-                        r1.toString().take(15),
-                        value
-                    )
-                )
+                }
             }
         }
     }

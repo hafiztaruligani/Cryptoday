@@ -25,7 +25,6 @@ interface ApiService {
     suspend fun getCoinDetail(
         @Path("coinId") coinId: String,
         @Query("vs_currency") vsCurrency: String = "USD"
-
     ): CoinDetailResponse
 
     @GET("search")

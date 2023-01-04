@@ -100,7 +100,7 @@ data class CoinResponse(
         return MarketData(
             timeUnit = "24h", // TODO: declare time unit (24h, 1h, ...)
             marketCapRank = marketCapRank,
-            currentPrice = currentPrice?.toString()?.toDouble() ?: 0.0,
+            currentPrice = currentPrice?.toString()?.toBigDecimal() ?: (0).toBigDecimal(),
             priceChangePercentage = marketCapChangePercentage24h?.toString()?.toDouble() ?: 0.0,
             low = low24h?.toString()?.toDouble() ?: 0.0,
             high = high24h?.toString()?.toDouble() ?: 0.0,

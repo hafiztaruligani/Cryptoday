@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Filter
+import android.widget.Toast
+import com.hafiztaruligani.cryptoday.R
 import com.hafiztaruligani.cryptoday.databinding.ItemAutocompleteCoinBinding
 import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
 import com.hafiztaruligani.cryptoday.util.glide
@@ -21,7 +23,17 @@ class AutoCompleteAdapter(
         if (value != coins.toList()) {
             coins = value.toMutableList()
             notifyDataSetChanged()
+            notFoundCheck()
         }
+    }
+
+    private fun notFoundCheck() {
+        if (coins.isEmpty())
+            Toast.makeText(
+                context,
+                context.getString(R.string.coin_not_found),
+                Toast.LENGTH_SHORT
+            ).show()
     }
 
     override fun getCount(): Int {
@@ -46,7 +58,7 @@ class AutoCompleteAdapter(
             binding = ItemAutocompleteCoinBinding.bind(view)
         }
         binding.apply {
-            name.text = coins[position].name
+            name.text = coins[position].getTitle()
             logo.glide(context, coins[position].logo)
         }
         return view

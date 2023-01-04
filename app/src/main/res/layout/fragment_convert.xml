@@ -35,16 +35,15 @@
             style="@style/font_medium"
             android:layout_width="match_parent"
             android:layout_height="48dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/rounded_edit_text"
             android:inputType="text"
+            android:maxLines="1"
             android:paddingHorizontal="8dp"
             android:text="@={viewModel.coin1Param}"
-            android:maxLines="1"
-            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView13"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/coin1_amount" />
 
         <ImageView
             android:id="@+id/logo1"
@@ -54,7 +53,8 @@
             android:padding="4dp"
             app:layout_constraintBottom_toBottomOf="@+id/coin1_auto_complete"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/coin1_auto_complete" />
+            app:layout_constraintTop_toTopOf="@+id/coin1_auto_complete"
+            android:contentDescription="@string/default_content_description" />
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/loading1"
@@ -70,29 +70,34 @@
         <EditText
             android:id="@+id/coin1_amount"
             style="@style/font_medium"
-            android:layout_marginTop="16dp"
-            android:paddingHorizontal="8dp"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:background="@drawable/rounded_edit_text"
+            android:hint="@string/amount"
             android:inputType="numberDecimal"
             android:maxLength="20"
+            android:paddingHorizontal="8dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/coin1_auto_complete" />
+            app:layout_constraintTop_toBottomOf="@+id/textView13"
+            android:text="@={viewModel.amount}"
+            android:autofillHints=""
+            />
 
         <ImageView
-            android:layout_marginTop="16dp"
             android:id="@+id/btn_swap"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            app:srcCompat="@drawable/ic_baseline_swap_vertical_circle_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/coin1_amount"
             android:clickable="true"
             android:focusable="true"
             android:onClickListener="@{()-> viewModel.swap()}"
-            />
+
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/coin1_auto_complete"
+            app:srcCompat="@drawable/ic_baseline_swap_vertical_circle_24"
+            android:contentDescription="@string/default_content_description" />
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/coin2_auto_complete"
@@ -117,7 +122,8 @@
             android:padding="4dp"
             app:layout_constraintBottom_toBottomOf="@+id/coin2_auto_complete"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/coin2_auto_complete" />
+            app:layout_constraintTop_toTopOf="@+id/coin2_auto_complete"
+            android:contentDescription="@string/default_content_description" />
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/loading2"
@@ -130,15 +136,14 @@
             android:indeterminate="true"
             android:visibility="gone"/>
 
-        <EditText
+        <TextView
             android:id="@+id/coin2_amount"
-            style="@style/font_medium"
-            android:layout_marginTop="16dp"
+            style="@style/font_auto_resize"
+            android:layout_marginTop="40dp"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="80dp"
+            android:gravity="center"
             android:paddingHorizontal="8dp"
-            android:inputType="numberDecimal"
-            android:maxLength="20"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:background="@drawable/rounded_edit_text"

@@ -1,5 +1,7 @@
 package com.hafiztaruligani.cryptoday.util
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.text.SpannableString
 import android.text.TextPaint
@@ -13,6 +15,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.hafiztaruligani.cryptoday.R
 import java.io.IOException
+import java.math.BigDecimal
 
 fun TextView.removeLinksUnderline(context: Context) {
     val spannable = SpannableString(text)
@@ -55,6 +58,14 @@ fun Fragment.toast(msg: String, isShowLong: Boolean = true) {
         if (isShowLong) Toast.LENGTH_LONG
         else Toast.LENGTH_SHORT
     ).show()
+}
+
+fun BigDecimal.notZero(): Boolean = this != (0).toBigDecimal()
+
+fun Context.copyToClipboard(text: String, label: String) {
+    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText(label, text)
+    clipboard.setPrimaryClip(clip)
 }
 
 // fun Any?.toInt(): Int = this.toString().toInt()

@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -15,6 +14,7 @@ import com.hafiztaruligani.cryptoday.databinding.FragmentConvertBinding
 import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
 import com.hafiztaruligani.cryptoday.presentation.adapters.AutoCompleteAdapter
 import com.hafiztaruligani.cryptoday.util.Cons.TAG
+import com.hafiztaruligani.cryptoday.util.copyToClipboard
 import com.hafiztaruligani.cryptoday.util.glide
 import com.hafiztaruligani.cryptoday.util.toast
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,16 +24,11 @@ import kotlinx.coroutines.flow.collectLatest
 class ConvertFragment : Fragment() {
 
     companion object {
-        fun newInstance() = ConvertFragment().also {
-            Log.d(TAG, "onCreateView: fragment convert")
-        }
+        fun newInstance() = ConvertFragment()
     }
 
     private val viewModel by viewModels<ConvertViewModel>()
     private lateinit var binding: FragmentConvertBinding
-
-    private var coin1Focus = false
-    private var coin2Focus = false
 
     private lateinit var adapter1: AutoCompleteAdapter
     private lateinit var adapter2: AutoCompleteAdapter
@@ -48,13 +43,23 @@ class ConvertFragment : Fragment() {
             lifecycleOwner = this@ConvertFragment.viewLifecycleOwner
         }
         setupAutoComplete()
-        setupAmountInputListener()
+        setupText()
         return binding.root
+    }
+
+    private fun setupText() {
+        binding.coin2Amount.setOnClickListener {
+            it.context.copyToClipboard(binding.coin2Amount.text.toString(), "Convert")
+            toast("Copied to the clipboard")
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        bindData()
+    }
 
+    private fun bindData() {
         viewLifecycleOwner.lifecycleScope.launchWhenResumed {
             viewModel.uiState.collectLatest { uiState ->
                 setErrorHandler(uiState)
@@ -68,8 +73,7 @@ class ConvertFragment : Fragment() {
 
     private fun setResult(state: ConvertUiState) = state.apply {
         result?.let { result ->
-            if (!coin2Focus) binding.coin2Amount.setText(result.second)
-            if (!coin1Focus) binding.coin1Amount.setText(result.first)
+            binding.coin2Amount.text = result
         }
     }
 
@@ -107,7 +111,6 @@ class ConvertFragment : Fragment() {
 
     private fun setErrorHandler(state: ConvertUiState) = state.apply {
         if (error.isNotBlank()) toast(error)
-        if (coinNotFound()) toast(getString(R.string.coin_not_found))
     }
 
     private fun setupAutoComplete() = binding.apply {
@@ -123,28 +126,12 @@ class ConvertFragment : Fragment() {
         coin1AutoComplete.setOnItemClickListener { adapterView, _, i, _ ->
             val coin = adapterView.getItemAtPosition(i) as CoinSimple
             this@ConvertFragment.viewModel.postCoinId1(coin.id)
-            coin1AutoComplete.setText(coin.name)
+            coin1AutoComplete.setText(coin.getTitle())
         }
         coin2AutoComplete.setOnItemClickListener { adapterView, _, i, _ ->
             val coin = adapterView.getItemAtPosition(i) as CoinSimple
-            this@ConvertFragment.viewModel.postCoinId2(coin.id)
+            this@ConvertFragment.viewModel.postCoinId2(coin.getTitle())
             coin2AutoComplete.setText(coin.name)
-        }
-    }
-    private fun setupAmountInputListener() = binding.apply {
-        coin1Amount.addTextChangedListener {
-            if (it.toString().isNotBlank() && it.toString().last() != '.')
-                this@ConvertFragment.viewModel.postCoinAmount1(it.toString())
-        }
-        coin2Amount.addTextChangedListener {
-            if (it.toString().isNotBlank() && it.toString().last() != '.')
-                this@ConvertFragment.viewModel.postCoinAmount2(it.toString())
-        }
-        coin1Amount.setOnFocusChangeListener { _, b ->
-            coin1Focus = b
-        }
-        coin2Amount.setOnFocusChangeListener { _, b ->
-            coin2Focus = b
         }
     }
 }

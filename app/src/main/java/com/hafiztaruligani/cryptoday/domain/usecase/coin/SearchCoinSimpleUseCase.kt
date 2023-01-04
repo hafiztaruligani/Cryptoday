@@ -15,7 +15,6 @@ class SearchCoinSimpleUseCase @Inject constructor(
     suspend operator fun invoke(params: String): Flow<Resource<List<CoinSimple>>> = flow {
         emit(Resource.Loading())
         try {
-
             val data = coinRepository.searchCoinId(params)
             emit(Resource.Success(data))
         } catch (e: HttpException) {
