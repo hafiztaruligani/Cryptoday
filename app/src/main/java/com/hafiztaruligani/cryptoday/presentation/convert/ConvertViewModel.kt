@@ -148,6 +148,10 @@ class ConvertViewModel @Inject constructor(
         }
     }
 
+    fun submitAmount(value: String){
+        amount.value = value
+    }
+
     fun swap() {
         var tmp = _coin1Id.value
         _coin1Id.value = _coin2Id.value

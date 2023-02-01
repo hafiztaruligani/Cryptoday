@@ -55,6 +55,11 @@ android {
     buildFeatures {
         viewBinding true
         dataBinding true
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.3.2"
     }
 
     testOptions {
@@ -82,7 +87,7 @@ ktlint {
     }
 }
 
-tasks.getByPath("preBuild").dependsOn("ktlintFormat")
+//tasks.getByPath("preBuild").dependsOn("ktlintFormat")
 
 dependencies {
 
@@ -114,6 +119,7 @@ dependencies {
     def hilt_version = "2.43.2"
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+    implementation "androidx.hilt:hilt-navigation-compose:1.1.0-alpha01"
 
     //retrofit
     def retrofit_version = "2.9.0"
@@ -154,5 +160,22 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:4.6.1")
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
     testImplementation('org.jetbrains.kotlin:kotlin-test:1.7.20')
+
+    // jetpack compose
+    def composeBom = platform('androidx.compose:compose-bom:2022.12.00')
+    implementation composeBom
+    androidTestImplementation composeBom
+
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.foundation:foundation'
+
+    implementation 'androidx.activity:activity-compose:1.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
+
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+
+    implementation "androidx.navigation:navigation-compose:2.5.3"
 
 }

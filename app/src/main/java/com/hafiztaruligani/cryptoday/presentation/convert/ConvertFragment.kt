@@ -1,10 +1,11 @@
 package com.hafiztaruligani.cryptoday.presentation.convert
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -13,7 +14,7 @@ import com.hafiztaruligani.cryptoday.R
 import com.hafiztaruligani.cryptoday.databinding.FragmentConvertBinding
 import com.hafiztaruligani.cryptoday.domain.model.CoinSimple
 import com.hafiztaruligani.cryptoday.presentation.adapters.AutoCompleteAdapter
-import com.hafiztaruligani.cryptoday.util.Cons.TAG
+import com.hafiztaruligani.cryptoday.presentation.common.Typography
 import com.hafiztaruligani.cryptoday.util.copyToClipboard
 import com.hafiztaruligani.cryptoday.util.glide
 import com.hafiztaruligani.cryptoday.util.toast
@@ -32,6 +33,7 @@ class ConvertFragment : Fragment() {
 
     private lateinit var adapter1: AutoCompleteAdapter
     private lateinit var adapter2: AutoCompleteAdapter
+    lateinit var composeView: ComposeView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,7 +46,21 @@ class ConvertFragment : Fragment() {
         }
         setupAutoComplete()
         setupText()
-        return binding.root
+        return ComposeView(requireContext()).apply{
+            composeView = this
+        }//binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        composeView.setContent {
+            MaterialTheme(
+                typography = Typography
+            ) {
+                ConvertScreen()
+            }
+        }
+    //bindData()
     }
 
     private fun setupText() {
@@ -52,11 +68,6 @@ class ConvertFragment : Fragment() {
             it.context.copyToClipboard(binding.coin2Amount.text.toString(), "Convert")
             toast("Copied to the clipboard")
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        bindData()
     }
 
     private fun bindData() {
